@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * VitalChain design system.
+ * A dark, data-dense "command center" aesthetic — the convention for
+ * operations/monitoring tooling (think mission control, NOC dashboards).
+ * Color choices: teal/cyan primary (clinical trust), amber/red for severity.
+ */
+
+@theme {
+  --color-bg: #0a0f1a;
+  --color-surface: #0f1626;
+  --color-surface-2: #151e30;
+  --color-border: #1f2a3f;
+  --color-border-soft: #18233650;
+
+  --color-fg: #e6edf6;
+  --color-muted: #8a99b0;
+  --color-faint: #5a6a82;
+
+  --color-brand: #2dd4bf;
+  --color-brand-dim: #134e4a;
+  --color-accent: #38bdf8;
+
+  --color-ok: #34d399;
+  --color-warn: #fbbf24;
+  --color-danger: #f87171;
+  --color-critical: #fb3b6b;
+  --color-info: #60a5fa;
+  --color-violet: #a78bfa;
+
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-card: 14px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-bg);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #0e2a3340 0%, transparent 60%),
+    radial-gradient(1000px 500px at -10% 10%, #1a213d40 0%, transparent 55%),
+    var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+}
+
+/* Thin, on-brand scrollbars for the data-dense panels. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+}
+
+/* Subtle entrance for panels. */
+@keyframes vc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.vc-rise {
+  animation: vc-rise 0.4s ease both;
+}
+
+/* Live "pulse" dot for active/critical states. */
+@keyframes vc-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+.vc-pulse {
+  animation: vc-pulse 1.6s ease-in-out infinite;
+}
+
+/* Animated dashed route line for the logistics map. */
+@keyframes vc-dash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+.vc-flow {
+  stroke-dasharray: 6 8;
+  animation: vc-dash 30s linear infinite;
 }
