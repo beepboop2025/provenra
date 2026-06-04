@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   ScanLine,
   LayoutDashboard,
+  FlaskConical,
   Bell,
   Globe,
   Menu,
@@ -23,6 +24,7 @@ import { Badge } from "@/components/ui/primitives";
 const NAV = [
   { href: "/", label: "Command Center", icon: LayoutDashboard, module: null },
   { href: "/trace", label: "Track & Trace", icon: ScanLine, module: "trace" },
+  { href: "/quality", label: "Quality & NSQ Watch", icon: FlaskConical, module: "quality" },
   { href: "/coldchain", label: "Cold Chain", icon: Snowflake, module: "coldchain" },
   { href: "/inventory", label: "Shortage & Inventory", icon: PackageSearch, module: "inventory" },
   { href: "/compliance", label: "Recall & Compliance", icon: ShieldCheck, module: "compliance" },

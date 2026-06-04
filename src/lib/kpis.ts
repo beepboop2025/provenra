@@ -9,6 +9,9 @@ export function overviewKpis(d: VitalChainData = getData()): Kpi[] {
   const suspectUnits = d.serials.filter((s) => s.status === "suspect" || s.riskScore >= 70).length;
   const atRiskProducts = d.shortages.filter((s) => s.riskScore >= 65).length;
   const openRecalls = d.recalls.filter((r) => r.status !== "completed").length;
+  const nsqInInventory = d.qualityAlerts.filter(
+    (q) => q.inInventory && q.action !== "cleared"
+  ).length;
   const totalUnits = d.batches.reduce((a, b) => a + b.quantity, 0);
   const onTime =
     (d.shipments.filter((s) => s.status === "delivered" || s.status === "in_transit").length /
@@ -66,11 +69,11 @@ export function overviewKpis(d: VitalChainData = getData()): Kpi[] {
       spark: spark("recall", 12, false),
     },
     {
-      label: "Network Facilities",
-      value: String(d.facilities.length),
-      delta: 6.0,
-      deltaGood: "up",
-      spark: spark("fac", 12, true),
+      label: "NSQ Batches in Inventory",
+      value: String(nsqInInventory),
+      delta: 7.5,
+      deltaGood: "down",
+      spark: spark("nsq", 12, false),
     },
   ];
 }

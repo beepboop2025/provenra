@@ -1,12 +1,15 @@
 import {
   CARRIERS,
+  INDIAN_STATES,
   INTL_NODES,
   IN_DEMAND_CENTERS,
   IN_HUBS,
   MANUFACTURERS,
   MARKETS,
   PRODUCTS,
+  QUALITY_DEFECTS,
   RECALL_REASONS,
+  TEST_LABS,
 } from "@/lib/data/seed";
 import {
   excursionSeverity,
@@ -28,6 +31,7 @@ import type {
   Facility,
   FacilityType,
   Product,
+  QualityAlert,
   Recall,
   SensorReading,
   SerialUnit,
@@ -104,6 +108,13 @@ function buildProducts(manufacturers: Facility[]): Product[] {
   return PRODUCTS.map((p, i) => {
     const mfg = manufacturers[i % manufacturers.length];
     const rnd = mulberry32(hashSeed(p.name));
+    // Research: ~70% of India's bulk-drug/API imports come from China; antibiotics
+    // ~87%. Older generic sterile injectables are often single-source. Essential
+    // (NLEM) drugs are price-capped under DPCO → margin pressure.
+    const chinaHeavy = p.category === "Anti-infectives" || rnd() > 0.55;
+    const apiDependencePct = chinaHeavy ? Math.round(60 + rnd() * 38) : Math.round(rnd() * 45);
+    const singleSource =
+      (p.form === "injection" || p.form === "biologic" || p.form === "vaccine") && rnd() > 0.5;
     return {
       id: `PRD-${String(i).padStart(3, "0")}`,
       name: p.name,
@@ -118,6 +129,10 @@ function buildProducts(manufacturers: Facility[]): Product[] {
       gtin: `0890${String(70000 + Math.floor(rnd() * 29999))}${i}`.slice(0, 14).padEnd(14, "0"),
       mrp: p.mrp,
       essential: p.essential,
+      apiSource: chinaHeavy ? "CN" : "IN",
+      apiDependencePct,
+      singleSource,
+      priceCapped: p.essential,
     };
   });
 }
@@ -134,6 +149,10 @@ function buildBatches(products: Product[]): Batch[] {
       const expiry = new Date(mfg.getTime() + shelfMonths * 30 * dayMs);
       const expired = expiry.getTime() < NOW.getTime();
       const statusRoll = rnd();
+      // Liquid orals (syrup) carry the DEG/EG contamination risk that killed
+      // 300+ children since 2022 — a small fraction use uncertified excipients.
+      const liquid = p.dosageForm === "syrup" || p.dosageForm === "injection";
+      const uncertified = liquid && rnd() > 0.82;
       out.push({
         id: `BTH-${p.id}-${b}`,
         batchNo: `${p.name.slice(0, 3).toUpperCase()}${mfg.getFullYear()}${String(b + 1).padStart(2, "0")}${Math.floor(rnd() * 900 + 100)}`,
@@ -151,6 +170,8 @@ function buildBatches(products: Product[]): Batch[] {
               : statusRoll > 0.4
                 ? "in_distribution"
                 : "released",
+        excipientGrade: uncertified ? "uncertified" : "pharmacopoeial",
+        degEgClear: !(uncertified && rnd() > 0.4),
       });
     }
   });
@@ -251,13 +272,21 @@ function buildExcursions(shipments: Shipment[], products: Product[]): Excursion[
     if (s.excursionCount === 0) return;
     const product = products.find((p) => p.id === s.productId)!;
     const rnd = mulberry32(hashSeed(s.id + "exc"));
+    // Freeze-sensitive products (refrigerated 2–8°C: vaccines, insulin) can suffer
+    // freeze excursions; frozen/ambient products only over-heat.
+    const freezeSensitive = s.tempRange.min >= 0 && s.tempRange.min <= 8;
     for (let e = 0; e < s.excursionCount; e++) {
+      const kind: Excursion["kind"] = freezeSensitive && rnd() > 0.5 ? "freeze" : "heat";
       const durationMin = Math.floor(rnd() * 240) + 15;
       const peakDeviation = +(rnd() * 9 + 0.5).toFixed(1);
-      // synthesize a temp profile around the breach to compute MKT
-      const profile = Array.from({ length: 12 }, () => s.tempRange.max + (rnd() - 0.3) * peakDeviation);
+      // synthesize a temp profile around the breached edge to compute MKT
+      const edge = kind === "freeze" ? s.tempRange.min - peakDeviation : s.tempRange.max + peakDeviation;
+      const profile = Array.from({ length: 12 }, () => edge + (rnd() - 0.5) * peakDeviation);
       const mkt = +meanKineticTemperature(profile).toFixed(1);
-      const severity = excursionSeverity(peakDeviation, durationMin);
+      // Freezing is treated as at least major — it silently destroys biologics.
+      const baseSeverity = excursionSeverity(peakDeviation, durationMin);
+      const severity =
+        kind === "freeze" && baseSeverity === "minor" ? "major" : baseSeverity;
       out.push({
         id: `EXC-${s.id}-${e}`,
         shipmentId: s.id,
@@ -266,9 +295,12 @@ function buildExcursions(shipments: Shipment[], products: Product[]): Excursion[
         startedAt: addDays(NOW, -rnd() * 3),
         durationMin,
         peakDeviation,
+        kind,
         severity,
         mkt,
-        stabilityImpacted: severity === "critical" || (severity === "major" && rnd() > 0.5),
+        // Freeze damage to freeze-sensitive biologics is almost always impacting.
+        stabilityImpacted:
+          kind === "freeze" ? rnd() > 0.25 : severity === "critical" || (severity === "major" && rnd() > 0.5),
         acknowledged: rnd() > 0.6,
       });
     }
@@ -342,6 +374,12 @@ function buildRecalls(products: Product[], batches: Batch[]): Recall[] {
     const recallClass = rnd() > 0.7 ? "I" : rnd() > 0.4 ? "II" : "III";
     const affected = b.quantity;
     const retrieved = Math.floor(affected * rnd() * 0.9);
+    // Cross-state spread: India has no mandatory nationwide recall mechanism, so
+    // the number of states reached drives coordination complexity.
+    const stateCount = 2 + Math.floor(rnd() * 9);
+    const affectedStates = [...INDIAN_STATES]
+      .filter((_, idx) => (hashSeed(b.id + idx) % 16) < stateCount)
+      .slice(0, stateCount);
     out.push({
       id: `RCL-${i}`,
       ref: `CDSCO/REC/2026/${4100 + i}`,
@@ -355,9 +393,58 @@ function buildRecalls(products: Product[], batches: Batch[]): Recall[] {
       affectedUnits: affected,
       retrievedUnits: retrieved,
       markets: product.essential ? ["IN", "US"] : ["IN"],
+      affectedStates,
+      nationwideCoordination: recallClass === "I" ? rnd() > 0.3 : rnd() > 0.6,
     });
   });
   return out;
+}
+
+/**
+ * Quality / NSQ alerts modelled on CDSCO's monthly drug-alert sweeps (~150+
+ * failing batches/month). Some are matched to batches held in our network
+ * (driving quarantine/recall), others are external surveillance signals.
+ */
+function buildQualityAlerts(products: Product[], batches: Batch[]): QualityAlert[] {
+  const out: QualityAlert[] = [];
+  const count = 14;
+  for (let i = 0; i < count; i++) {
+    const rnd = mulberry32(hashSeed("qa" + i));
+    const product = pick(products, rnd());
+    const tmpl = pick(QUALITY_DEFECTS, rnd());
+    // DEG/EG only meaningfully applies to liquid orals.
+    const defect =
+      tmpl.defect === "deg_eg" && product.dosageForm !== "syrup" && product.dosageForm !== "injection"
+        ? "nsq"
+        : tmpl.defect;
+    const matched = rnd() > 0.45;
+    const batch = matched
+      ? pick(batches.filter((b) => b.productId === product.id), rnd()) ?? batches[0]
+      : null;
+    const unitsHeld = matched ? Math.floor(rnd() * 12000) + 500 : 0;
+    const severeDefect = defect === "deg_eg" || defect === "spurious" || defect === "nitrosamine";
+    out.push({
+      id: `QA-${i}`,
+      defect,
+      productName: product.name,
+      batchNo: batch?.batchNo ?? `${product.name.slice(0, 3).toUpperCase()}${2025}${String(i).padStart(2, "0")}${Math.floor(rnd() * 900 + 100)}`,
+      manufacturer: pick(MANUFACTURERS, rnd()),
+      testLab: pick(TEST_LABS, rnd()),
+      description: tmpl.desc,
+      flaggedAt: addDays(NOW, -Math.floor(rnd() * 28) - 1),
+      source: "CDSCO monthly drug alert",
+      inInventory: matched,
+      unitsHeld,
+      action: !matched
+        ? "cleared"
+        : severeDefect
+          ? "recall_initiated"
+          : rnd() > 0.5
+            ? "quarantined"
+            : "investigating",
+    });
+  }
+  return out.sort((a, b) => +new Date(b.flaggedAt) - +new Date(a.flaggedAt));
 }
 
 function buildSuppliers(facilities: Facility[]): Supplier[] {
@@ -384,6 +471,8 @@ function buildSuppliers(facilities: Facility[]): Supplier[] {
       lastAuditAt: addDays(NOW, -months * 30),
       certifications: f.certifications,
       openCapas: capas,
+      gmpReadiness: gmpReadinessFor(f.location.market, risk, rnd),
+      nsqFlags: risk > 45 ? Math.floor(rnd() * 4) : 0,
     });
   });
 
@@ -406,10 +495,28 @@ function buildSuppliers(facilities: Facility[]): Supplier[] {
       lastAuditAt: addDays(NOW, -months * 30),
       certifications: ["WHO-GMP", "ISO 9001"],
       openCapas: capas,
+      gmpReadiness: gmpReadinessFor("IN", risk, rnd),
+      nsqFlags: risk > 45 ? Math.floor(rnd() * 3) : 0,
     });
   });
 
   return all.sort((a, b) => b.riskScore - a.riskScore);
+}
+
+/**
+ * Revised Schedule M GMP readiness. Research: as of Dec 2025 only ~26% of MSME
+ * units had even filed a gap analysis; large/export units are mostly compliant.
+ */
+function gmpReadinessFor(
+  market: string,
+  risk: number,
+  rnd: () => number
+): Supplier["gmpReadiness"] {
+  if (market !== "IN") return "compliant"; // export markets already GMP-certified
+  const r = rnd();
+  if (risk > 50) return r > 0.5 ? "not_started" : "in_progress";
+  if (risk > 30) return r > 0.5 ? "in_progress" : "gap_filed";
+  return r > 0.3 ? "compliant" : "gap_filed";
 }
 
 function buildRequirements(): ComplianceRequirement[] {
@@ -418,8 +525,8 @@ function buildRequirements(): ComplianceRequirement[] {
     { market: "IN", framework: "DAVA / iVEDA", title: "Barcode serialization for exports & domestic top brands", status: "compliant", owner: "Supply Chain IT" },
     { market: "IN", framework: "CDSCO", title: "Drug recall guidance — 2024 SOP adherence", status: "compliant", owner: "Regulatory Affairs" },
     { market: "IN", framework: "NPPA", title: "DPCO price control — NLEM ceiling adherence", status: "at_risk", owner: "Commercial" },
-    { market: "US", framework: "DSCSA", title: "Enhanced drug distribution security — EPCIS interoperability", status: "non_compliant", owner: "Global Trade" },
-    { market: "EU", framework: "EU FMD", title: "Safety features & EMVS verification at dispense", status: "compliant", owner: "Global Trade" },
+    { market: "US", framework: "DSCSA", title: "EPCIS interoperability — stabilization ended 27 Nov 2024; mfr enforcement 27 May 2025", status: "non_compliant", owner: "Global Trade" },
+    { market: "EU", framework: "EU FMD", title: "2D DataMatrix safety features & EMVS verification at dispense", status: "compliant", owner: "Global Trade" },
     { market: "IN", framework: "WHO-GDP", title: "Good Distribution Practice — cold-chain qualification", status: "at_risk", owner: "Logistics QA" },
   ];
   return reqs.map((r, i) => ({
@@ -434,7 +541,8 @@ function buildAlerts(
   shortages: ShortageAlert[],
   recalls: Recall[],
   serials: SerialUnit[],
-  requirements: ComplianceRequirement[]
+  requirements: ComplianceRequirement[],
+  qualityAlerts: QualityAlert[]
 ): Alert[] {
   const out: Alert[] = [];
 
@@ -443,12 +551,31 @@ function buildAlerts(
       id: `ALR-EXC-${e.id}`,
       module: "coldchain",
       severity: e.severity === "critical" ? "critical" : "warning",
-      title: `${e.severity.toUpperCase()} cold-chain excursion — ${e.productName}`,
-      detail: `Shipment ${e.shipmentRef}: +${e.peakDeviation}°C peak, MKT ${e.mkt}°C over ${e.durationMin}min.${e.stabilityImpacted ? " Stability impacted." : ""}`,
+      title: `${e.kind === "freeze" ? "FREEZE" : e.severity.toUpperCase()} cold-chain excursion — ${e.productName}`,
+      detail: `Shipment ${e.shipmentRef}: ${e.kind === "freeze" ? "−" : "+"}${e.peakDeviation}°C ${e.kind === "freeze" ? "below 0°C" : "over limit"}, MKT ${e.mkt}°C over ${e.durationMin}min.${e.stabilityImpacted ? " Stability impacted." : ""}`,
       timestamp: e.startedAt,
       acknowledged: false,
     })
   );
+
+  // Quality / NSQ alerts matched to held inventory — the #1 India problem.
+  qualityAlerts
+    .filter((q) => q.inInventory && q.action !== "cleared")
+    .slice(0, 5)
+    .forEach((q) =>
+      out.push({
+        id: `ALR-QA-${q.id}`,
+        module: "quality",
+        severity:
+          q.defect === "deg_eg" || q.defect === "spurious" || q.defect === "nitrosamine"
+            ? "critical"
+            : "warning",
+        title: `${q.defect === "deg_eg" ? "DEG/EG contamination" : q.defect === "spurious" ? "Spurious drug" : "NSQ batch"} — ${q.productName}`,
+        detail: `${q.description}. Batch ${q.batchNo} (${q.testLab}). ${q.unitsHeld.toLocaleString("en-IN")} units held → ${q.action.replace("_", " ")}.`,
+        timestamp: q.flaggedAt,
+        acknowledged: false,
+      })
+    );
 
   shortages.filter((s) => s.riskScore >= 65).slice(0, 4).forEach((s) =>
     out.push({
@@ -523,7 +650,8 @@ export function getData(): VitalChainData {
   const recalls = buildRecalls(products, batches);
   const suppliers = buildSuppliers(facilities);
   const requirements = buildRequirements();
-  const alerts = buildAlerts(excursions, shortages, recalls, serials, requirements);
+  const qualityAlerts = buildQualityAlerts(products, batches);
+  const alerts = buildAlerts(excursions, shortages, recalls, serials, requirements, qualityAlerts);
 
   _cache = {
     markets: MARKETS,
@@ -538,6 +666,7 @@ export function getData(): VitalChainData {
     recalls,
     suppliers,
     requirements,
+    qualityAlerts,
     alerts,
   };
   return _cache;

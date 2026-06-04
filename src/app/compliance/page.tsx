@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, Recycle, Factory, FileCheck2 } from "lucide-react";
+import { ShieldCheck, Recycle, Factory, FileCheck2, Info, ClipboardCheck } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
@@ -32,6 +32,19 @@ export default function CompliancePage() {
 
   const atRiskReqs = data.requirements.filter((r) => r.status !== "compliant").length;
   const highRiskSuppliers = data.suppliers.filter((s) => s.riskScore >= 50).length;
+
+  // Schedule M GMP readiness (India suppliers). Research: deadline 31 Dec 2025;
+  // only ~26% of MSME units had even filed a gap analysis by late 2025.
+  const inSuppliers = data.suppliers.filter((s) => s.market === "IN");
+  const gmpBuckets = {
+    compliant: inSuppliers.filter((s) => s.gmpReadiness === "compliant").length,
+    gap_filed: inSuppliers.filter((s) => s.gmpReadiness === "gap_filed").length,
+    in_progress: inSuppliers.filter((s) => s.gmpReadiness === "in_progress").length,
+    not_started: inSuppliers.filter((s) => s.gmpReadiness === "not_started").length,
+  };
+  const gmpReadyPct = inSuppliers.length
+    ? Math.round((gmpBuckets.compliant / inSuppliers.length) * 100)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -67,6 +80,14 @@ export default function CompliancePage() {
           subtitle="Live retrieval progress with regulatory classification"
           icon={<Recycle size={16} />}
         />
+        <div className="flex items-start gap-2 border-b border-[var(--color-border)] bg-[var(--color-warn)]/5 px-4 py-2.5">
+          <Info size={14} className="mt-0.5 shrink-0 text-[var(--color-warn)]" />
+          <p className="text-[11px] text-[var(--color-muted)]">
+            India has <span className="font-medium text-[var(--color-fg)]">no mandatory nationwide drug-recall law</span> —
+            a batch failing in one state has no enforceable national withdrawal pathway. VitalChain operationalizes
+            de-facto nationwide recall via cross-state batch traceability and coordinated notification.
+          </p>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -76,6 +97,7 @@ export default function CompliancePage() {
                 <th className="px-4 py-2 font-medium">Reason</th>
                 <th className="px-4 py-2 font-medium">Class</th>
                 <th className="px-4 py-2 font-medium">Markets</th>
+                <th className="px-4 py-2 font-medium">Spread</th>
                 <th className="px-4 py-2 font-medium">Retrieval</th>
                 <th className="px-4 py-2 font-medium">Status</th>
               </tr>
@@ -94,6 +116,18 @@ export default function CompliancePage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-2.5 text-xs text-[var(--color-muted)]">{r.markets.join(", ")}</td>
+                    <td className="px-4 py-2.5">
+                      <span className="text-xs tabular-nums text-[var(--color-fg)]">
+                        {r.affectedStates.length} states
+                      </span>
+                      <div className="mt-0.5">
+                        {r.nationwideCoordination ? (
+                          <span className="text-[10px] text-[var(--color-ok)]">✓ coordinated</span>
+                        ) : (
+                          <span className="text-[10px] text-[var(--color-danger)]">⨯ uncoordinated</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="px-4 py-2.5">
                       <div className="flex w-32 items-center gap-2">
                         <Progress value={pct} tone={pct > 80 ? "ok" : "info"} />
@@ -131,7 +165,10 @@ export default function CompliancePage() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{s.name}</p>
                     <p className="text-[11px] text-[var(--color-faint)]">
-                      {s.market} · OTIF {formatPct(s.onTimeDelivery)} · reject {formatPct(s.qualityRejectRate)} · {s.openCapas} open CAPAs
+                      {s.market} · OTIF {formatPct(s.onTimeDelivery)} · reject {formatPct(s.qualityRejectRate)} · {s.openCapas} CAPAs
+                      {s.nsqFlags > 0 && (
+                        <span className="ml-1 text-[var(--color-danger)]">· {s.nsqFlags} NSQ</span>
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
@@ -187,6 +224,76 @@ export default function CompliancePage() {
           </ul>
         </Card>
       </div>
+
+      {/* Schedule M GMP readiness tracker */}
+      <Card>
+        <CardHeader
+          title="Revised Schedule M GMP Readiness"
+          subtitle="India MSME compliance deadline 31 Dec 2025 — only ~26% had filed a gap analysis"
+          icon={<ClipboardCheck size={16} />}
+          action={
+            <Badge tone={gmpReadyPct >= 60 ? "ok" : "warn"}>{gmpReadyPct}% compliant</Badge>
+          }
+        />
+        <div className="grid gap-4 p-4 lg:grid-cols-4">
+          <GmpStat label="Compliant" value={gmpBuckets.compliant} tone="ok" />
+          <GmpStat label="Gap analysis filed" value={gmpBuckets.gap_filed} tone="info" />
+          <GmpStat label="Upgrade in progress" value={gmpBuckets.in_progress} tone="warn" />
+          <GmpStat label="Not started" value={gmpBuckets.not_started} tone="critical" />
+        </div>
+        <div className="border-t border-[var(--color-border)]">
+          <ul className="divide-y divide-[var(--color-border)]">
+            {inSuppliers
+              .filter((s) => s.gmpReadiness !== "compliant")
+              .slice(0, 6)
+              .map((s) => (
+                <li key={s.id} className="flex items-center justify-between gap-2 px-4 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{s.name}</p>
+                    <p className="text-[11px] text-[var(--color-faint)]">
+                      {s.tier} · risk {s.riskScore}
+                      {s.nsqFlags > 0 && <span className="text-[var(--color-danger)]"> · {s.nsqFlags} NSQ</span>}
+                    </p>
+                  </div>
+                  <Badge
+                    tone={
+                      s.gmpReadiness === "not_started"
+                        ? "critical"
+                        : s.gmpReadiness === "in_progress"
+                          ? "warn"
+                          : "info"
+                    }
+                  >
+                    {s.gmpReadiness.replace("_", " ")}
+                  </Badge>
+                </li>
+              ))}
+          </ul>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function GmpStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "ok" | "info" | "warn" | "critical";
+}) {
+  const color = {
+    ok: "text-[var(--color-ok)]",
+    info: "text-[var(--color-info)]",
+    warn: "text-[var(--color-warn)]",
+    critical: "text-[var(--color-critical)]",
+  }[tone];
+  return (
+    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)]/40 p-3">
+      <div className={`text-2xl font-bold tabular-nums ${color}`}>{value}</div>
+      <div className="text-xs text-[var(--color-muted)]">{label}</div>
     </div>
   );
 }

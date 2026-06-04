@@ -29,7 +29,7 @@ export default function ColdChainPage() {
   const series = useMemo(() => (selected ? sensorSeries(selected) : []), [selected]);
 
   const liveBreaches = coldShipments.filter((s) => s.status === "exception").length;
-  const totalExcursions = data.excursions.length;
+  const freezeCount = data.excursions.filter((e) => e.kind === "freeze").length;
   const stabilityImpacted = data.excursions.filter((e) => e.stabilityImpacted).length;
   const inTolerance = coldShipments.length
     ? Math.round(
@@ -66,7 +66,7 @@ export default function ColdChainPage() {
           <Metric label="Fleet in tolerance" value={`${inTolerance}%`} tone="ok" />
         </Card>
         <Card className="p-4">
-          <Metric label="Total excursions (7d)" value={totalExcursions} tone="warn" />
+          <Metric label="Freeze excursions" value={freezeCount} tone="critical" sub="silent biologic damage" />
         </Card>
         <Card className="p-4">
           <Metric label="Stability impacted" value={stabilityImpacted} tone="critical" sub="QA review required" />
@@ -188,6 +188,7 @@ export default function ColdChainPage() {
             <thead>
               <tr className="border-b border-[var(--color-border)] text-left text-[11px] uppercase tracking-wider text-[var(--color-faint)]">
                 <th className="px-4 py-2 font-medium">Product</th>
+                <th className="px-4 py-2 font-medium">Type</th>
                 <th className="px-4 py-2 font-medium">Shipment</th>
                 <th className="px-4 py-2 font-medium">Started</th>
                 <th className="px-4 py-2 font-medium">Duration</th>
@@ -204,10 +205,17 @@ export default function ColdChainPage() {
                   className="border-b border-[var(--color-border)]/60 hover:bg-[var(--color-surface-2)]/40"
                 >
                   <td className="px-4 py-2.5 font-medium">{e.productName}</td>
+                  <td className="px-4 py-2.5">
+                    <Badge tone={e.kind === "freeze" ? "info" : "warn"}>
+                      {e.kind === "freeze" ? "❄ freeze" : "heat"}
+                    </Badge>
+                  </td>
                   <td className="px-4 py-2.5 font-mono text-xs text-[var(--color-brand)]">{e.shipmentRef}</td>
                   <td className="px-4 py-2.5 text-xs text-[var(--color-muted)]">{formatRelative(e.startedAt)}</td>
                   <td className="px-4 py-2.5 tabular-nums text-xs">{e.durationMin} min</td>
-                  <td className="px-4 py-2.5 tabular-nums text-xs text-[var(--color-warn)]">+{e.peakDeviation}°C</td>
+                  <td className="px-4 py-2.5 tabular-nums text-xs text-[var(--color-warn)]">
+                    {e.kind === "freeze" ? "−" : "+"}{e.peakDeviation}°C
+                  </td>
                   <td className="px-4 py-2.5 tabular-nums text-xs">{e.mkt}°C</td>
                   <td className="px-4 py-2.5">
                     <Badge tone={e.severity === "critical" ? "critical" : e.severity === "major" ? "warn" : "neutral"}>

@@ -112,6 +112,14 @@ export interface Product {
   mrp: number;
   /** Is this product on the National List of Essential Medicines? */
   essential: boolean;
+  /** Country the API / Key Starting Material is primarily sourced from. */
+  apiSource: MarketCode | "CN";
+  /** % of this product's API supply concentrated in `apiSource` (geopolitical risk). */
+  apiDependencePct: number;
+  /** Only one qualified manufacturer exists (single-source shortage risk). */
+  singleSource: boolean;
+  /** Price-capped under DPCO/NLEM (margin pressure → withdrawal/shortage risk). */
+  priceCapped: boolean;
 }
 
 export type BatchStatus =
@@ -133,6 +141,10 @@ export interface Batch {
   /** Total serialized units produced in this batch. */
   quantity: number;
   status: BatchStatus;
+  /** Excipient/raw-material grade — the DEG/EG cough-syrup tragedy root cause. */
+  excipientGrade: "pharmacopoeial" | "uncertified";
+  /** DEG/EG contamination test cleared (gates release for liquid orals). */
+  degEgClear: boolean;
 }
 
 export type SerialStatus =
@@ -236,6 +248,9 @@ export interface Excursion {
   durationMin: number;
   /** Peak deviation from the nearest band edge, °C. */
   peakDeviation: number;
+  /** Freeze excursions silently destroy DPT/Hep-B/insulin and are the most
+   *  damaging, most-missed kind in India's cold chain. */
+  kind: "freeze" | "heat";
   severity: ExcursionSeverity;
   /** Mean Kinetic Temperature over the excursion window. */
   mkt: number;
@@ -320,6 +335,11 @@ export interface Recall {
   /** Units retrieved so far. */
   retrievedUnits: number;
   markets: MarketCode[];
+  /** Indian states the affected batches reached — India has no mandatory
+   *  nationwide recall law, so cross-state coordination must be tracked. */
+  affectedStates: string[];
+  /** Whether nationwide cross-state withdrawal has been coordinated. */
+  nationwideCoordination: boolean;
 }
 
 export type SupplierTier = "critical" | "preferred" | "approved" | "probation";
@@ -337,6 +357,10 @@ export interface Supplier {
   lastAuditAt: string;
   certifications: string[];
   openCapas: number; // open corrective/preventive actions
+  /** Revised Schedule M GMP readiness (deadline 31 Dec 2025 for MSMEs). */
+  gmpReadiness: "compliant" | "gap_filed" | "in_progress" | "not_started";
+  /** Number of NSQ (Not of Standard Quality) batches attributed to this supplier. */
+  nsqFlags: number;
 }
 
 export interface ComplianceRequirement {
@@ -348,6 +372,41 @@ export interface ComplianceRequirement {
   /** Next audit/renewal due. */
   dueDate: string;
   owner: string;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Quality / NSQ surveillance (the #1 India problem: NSQ ≫ counterfeit)
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A drug-quality alert, modelled on CDSCO's monthly "Not of Standard Quality"
+ * (NSQ) / spurious drug alerts. CDSCO flags ~150+ failing batches every month;
+ * ingesting these and matching them to held inventory is the core of the
+ * Quality Watch module.
+ */
+export type QualityDefect =
+  | "nsq" // failed a pharmacopoeial spec (assay, dissolution, etc.)
+  | "spurious" // counterfeit / falsified
+  | "deg_eg" // diethylene/ethylene glycol contamination (cough-syrup tragedy)
+  | "nitrosamine" // genotoxic nitrosamine impurity above limit
+  | "adulterated"; // contamination / particulate / sterility failure
+
+export interface QualityAlert {
+  id: string;
+  defect: QualityDefect;
+  productName: string;
+  batchNo: string;
+  manufacturer: string;
+  /** Central or state government testing laboratory that flagged it. */
+  testLab: string;
+  description: string;
+  flaggedAt: string;
+  /** Source feed, e.g. "CDSCO monthly drug alert". */
+  source: string;
+  /** Matched to a batch in our network? */
+  inInventory: boolean;
+  unitsHeld: number;
+  action: "quarantined" | "investigating" | "recall_initiated" | "cleared";
 }
 
 /** Tamper-evident audit log entry (hash-chained). */
@@ -365,7 +424,7 @@ export interface AuditEntry {
 // Cross-cutting: unified alerts & KPIs
 // ────────────────────────────────────────────────────────────────────────────
 
-export type AlertModule = "trace" | "coldchain" | "inventory" | "compliance";
+export type AlertModule = "trace" | "coldchain" | "inventory" | "compliance" | "quality";
 export type AlertSeverity = "info" | "warning" | "critical";
 
 export interface Alert {
@@ -402,5 +461,6 @@ export interface VitalChainData {
   recalls: Recall[];
   suppliers: Supplier[];
   requirements: ComplianceRequirement[];
+  qualityAlerts: QualityAlert[];
   alerts: Alert[];
 }

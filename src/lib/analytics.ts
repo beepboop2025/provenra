@@ -103,6 +103,28 @@ export function supplierRiskScore(
   return Math.round(clamp(delivery + quality + capa + audit, 0, 100));
 }
 
+// ── Supply resilience / API geopolitical risk ───────────────────────────────
+
+/**
+ * Supply-resilience risk (0–100, higher = more fragile) for a product.
+ * Research basis: India imports ~70% of bulk-drug APIs from China (antibiotics
+ * ~87%); single-source generics (esp. sterile injectables) drive most shortages;
+ * DPCO price-capped essentials face margin-driven withdrawal.
+ */
+export function supplyResilienceRisk(
+  apiDependencePct: number,
+  singleSource: boolean,
+  priceCapped: boolean,
+  essential: boolean
+): number {
+  let score = 0;
+  score += apiDependencePct * 0.45; // foreign-API concentration
+  if (singleSource) score += 28; // no alternative manufacturer
+  if (priceCapped) score += 14; // margin pressure → discontinuation risk
+  if (essential) score += 8; // public-health criticality
+  return Math.round(clamp(score, 0, 100));
+}
+
 // ── Expiry / FEFO ───────────────────────────────────────────────────────────
 
 /**

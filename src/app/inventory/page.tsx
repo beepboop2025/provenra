@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PackageSearch, TrendingUp, CalendarClock, Boxes } from "lucide-react";
+import { PackageSearch, TrendingUp, CalendarClock, Boxes, Globe2 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { DemandForecastChart } from "@/components/charts/charts";
 import { getData, demandSeries } from "@/lib/data/engine";
-import { formatNumber, shelfLifeLabel, formatDate, daysUntil } from "@/lib/format";
+import { supplyResilienceRisk } from "@/lib/analytics";
+import { formatNumber, shelfLifeLabel, formatDate, daysUntil, formatPct } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { StockHealth } from "@/lib/types";
 
@@ -37,6 +38,16 @@ export default function InventoryPage() {
     .slice(0, 8);
 
   const forecast14 = series.filter((d) => d.actual === null).reduce((a, d) => a + d.forecast, 0);
+
+  // Supply-resilience risk (API geo-concentration + single-source + price cap).
+  const resilience = data.products
+    .map((p) => ({
+      product: p,
+      risk: supplyResilienceRisk(p.apiDependencePct, p.singleSource, p.priceCapped, p.essential),
+    }))
+    .sort((a, b) => b.risk - a.risk);
+  const chinaDependent = data.products.filter((p) => p.apiSource === "CN" && p.apiDependencePct >= 60).length;
+  const singleSourced = data.products.filter((p) => p.singleSource).length;
 
   return (
     <div className="space-y-6">
@@ -132,6 +143,75 @@ export default function InventoryPage() {
           </ul>
         </Card>
       </div>
+
+      {/* Supply resilience / API geopolitical risk */}
+      <Card>
+        <CardHeader
+          title="Supply Resilience & API Geopolitical Risk"
+          subtitle="~70% of India's bulk-drug APIs are imported from China; single-source generics drive most shortages"
+          icon={<Globe2 size={16} />}
+          action={
+            <div className="hidden gap-2 sm:flex">
+              <Badge tone="danger">{chinaDependent} China-dependent</Badge>
+              <Badge tone="warn">{singleSourced} single-source</Badge>
+            </div>
+          }
+        />
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--color-border)] text-left text-[11px] uppercase tracking-wider text-[var(--color-faint)]">
+                <th className="px-4 py-2 font-medium">Product</th>
+                <th className="px-4 py-2 font-medium">Form</th>
+                <th className="px-4 py-2 font-medium">API source</th>
+                <th className="px-4 py-2 font-medium">Import dependence</th>
+                <th className="px-4 py-2 font-medium">Sourcing</th>
+                <th className="px-4 py-2 font-medium">Resilience risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              {resilience.slice(0, 9).map(({ product: p, risk }) => (
+                <tr key={p.id} className="border-b border-[var(--color-border)]/60 hover:bg-[var(--color-surface-2)]/40">
+                  <td className="px-4 py-2.5 font-medium">
+                    {p.name}
+                    {p.essential && <span className="ml-1.5 text-[10px] text-[var(--color-warn)]">NLEM</span>}
+                    {p.priceCapped && <span className="ml-1.5 text-[10px] text-[var(--color-faint)]">DPCO</span>}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs capitalize text-[var(--color-muted)]">{p.dosageForm}</td>
+                  <td className="px-4 py-2.5">
+                    <Badge tone={p.apiSource === "CN" ? "danger" : "ok"}>
+                      {p.apiSource === "CN" ? "China" : "India"}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <div className="flex w-28 items-center gap-2">
+                      <Progress value={p.apiDependencePct} tone={p.apiDependencePct >= 60 ? "danger" : "warn"} />
+                      <span className="text-[10px] tabular-nums text-[var(--color-faint)]">
+                        {formatPct(p.apiDependencePct, 0)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <Badge tone={p.singleSource ? "critical" : "neutral"}>
+                      {p.singleSource ? "single-source" : "multi-source"}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <span
+                      className={cn(
+                        "text-sm font-semibold tabular-nums",
+                        risk >= 70 ? "text-[var(--color-critical)]" : risk >= 45 ? "text-[var(--color-danger)]" : "text-[var(--color-warn)]"
+                      )}
+                    >
+                      {risk}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       {/* FEFO expiry exposure */}
       <Card>

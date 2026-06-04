@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   ScanLine,
   AlertTriangle,
+  FlaskConical,
 } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
 import { formatRelative } from "@/lib/format";
@@ -16,6 +17,7 @@ const moduleIcon: Record<AlertModule, React.ComponentType<{ size?: number }>> = 
   coldchain: Snowflake,
   inventory: PackageSearch,
   compliance: ShieldCheck,
+  quality: FlaskConical,
 };
 
 const sevTone = {

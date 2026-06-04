@@ -166,6 +166,40 @@ export const THERAPEUTIC_COLORS: Record<string, string> = {
   Immunology: "#34d399",
 };
 
+/** Indian states/UTs used for cross-state recall tracking. */
+export const INDIAN_STATES = [
+  "Maharashtra", "Uttar Pradesh", "Gujarat", "Tamil Nadu", "Karnataka",
+  "West Bengal", "Rajasthan", "Madhya Pradesh", "Bihar", "Telangana",
+  "Andhra Pradesh", "Kerala", "Delhi", "Punjab", "Haryana", "Assam",
+] as const;
+
+/** Government drug-testing laboratories that declare batches NSQ. */
+export const TEST_LABS = [
+  "CDL Kolkata (Central)",
+  "CDTL Mumbai (Central)",
+  "RDTL Chandigarh (Central)",
+  "State Drug Lab, Maharashtra",
+  "State Drug Lab, Gujarat",
+  "State Drug Lab, Tamil Nadu",
+  "State Drug Lab, Telangana",
+] as const;
+
+/**
+ * NSQ / quality-defect templates modelled on CDSCO's monthly drug alerts
+ * (incl. brands named in the Dec-2025 sweep: Telma, Pantop, Montina, Chymoral)
+ * and the DEG/EG cough-syrup tragedies.
+ */
+export const QUALITY_DEFECTS = [
+  { defect: "nsq" as const, desc: "Failed assay — active content below pharmacopoeial limit" },
+  { defect: "nsq" as const, desc: "Failed dissolution test (delayed release)" },
+  { defect: "nsq" as const, desc: "Failed uniformity of content" },
+  { defect: "nsq" as const, desc: "Description / friability failure" },
+  { defect: "deg_eg" as const, desc: "Diethylene glycol detected above acceptable limit" },
+  { defect: "nitrosamine" as const, desc: "Nitrosamine impurity (NDMA) above acceptable intake" },
+  { defect: "adulterated" as const, desc: "Particulate matter / microbial contamination" },
+  { defect: "spurious" as const, desc: "Spurious — label declares a manufacturer who disowns the batch" },
+] as const;
+
 export const RECALL_REASONS = [
   "Failed dissolution specification (stability)",
   "Out-of-specification assay result",
