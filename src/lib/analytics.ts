@@ -1,5 +1,8 @@
 import type {
+  CapaStatus,
+  DeviationSeverity,
   ExcursionSeverity,
+  PickTask,
   StockHealth,
   TempRange,
 } from "@/lib/types";
@@ -141,4 +144,71 @@ export function expiringUnits(
   if (days <= 0) return onHand; // already expired
   const sellable = Math.floor(dailyDemand * days);
   return Math.max(0, onHand - sellable);
+}
+
+// ── Quality Management System (QMS) ──────────────────────────────────────────
+
+/**
+ * CAPA service-level: how many days a corrective/preventive action may stay open
+ * before it is overdue, keyed by the severity of the deviation that drove it.
+ *
+ * This is the key QMS policy lever — the regulated equivalent of an SLA. Tighter
+ * windows mean faster remediation but more "overdue" noise; looser windows risk
+ * letting critical issues age. Tune these to your quality system's commitments.
+ */
+export function capaSlaDays(severity: DeviationSeverity): number {
+  switch (severity) {
+    case "critical":
+      return 30; // critical deviations: closed within a month
+    case "major":
+      return 60;
+    case "minor":
+      return 90;
+  }
+}
+
+/** Resolve a CAPA's effective status, flipping to "overdue" past its due date. */
+export function capaEffectiveStatus(
+  status: CapaStatus,
+  dueAt: string
+): CapaStatus {
+  if (status === "closed") return "closed";
+  return daysUntil(dueAt) < 0 ? "overdue" : status;
+}
+
+/**
+ * Composite QMS health (0–100, higher = healthier). Blends open-deviation load,
+ * overdue-CAPA pressure, and how many critical issues are unresolved. This is the
+ * single number a Head of Quality watches.
+ */
+export function qmsHealthScore(
+  openDeviations: number,
+  overdueCapas: number,
+  criticalOpen: number
+): number {
+  const penalty =
+    openDeviations * 1.5 + overdueCapas * 6 + criticalOpen * 10;
+  return Math.round(clamp(100 - penalty, 0, 100));
+}
+
+// ── Warehouse Management (WMS) ───────────────────────────────────────────────
+
+/**
+ * FEFO pick accuracy: the share of picks that pulled the earliest-expiry batch.
+ * The single most important warehouse control for a pharma business — every
+ * non-FEFO pick leaves older stock on the shelf to expire. Short picks (no stock)
+ * are excluded since no batch choice was made.
+ */
+export function fefoPickRate(tasks: PickTask[]): number {
+  const decided = tasks.filter((t) => t.status !== "short" && t.status !== "queued");
+  if (!decided.length) return 100;
+  const compliant = decided.filter((t) => t.fefoCompliant).length;
+  return Math.round((compliant / decided.length) * 100);
+}
+
+/** Pick fulfilment rate: units actually picked vs ordered across all tasks. */
+export function pickFillRate(tasks: PickTask[]): number {
+  const ordered = tasks.reduce((a, t) => a + t.qtyOrdered, 0) || 1;
+  const picked = tasks.reduce((a, t) => a + t.qtyPicked, 0);
+  return Math.round((picked / ordered) * 100);
 }

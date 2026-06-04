@@ -421,10 +421,187 @@ export interface AuditEntry {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
+// Quality Management System (QMS): deviation → CAPA lifecycle, batch records
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A GMP deviation — any departure from an approved procedure, specification or
+ * standard. In a regulated plant every deviation must be investigated and, if
+ * warranted, drive a CAPA. Deviations feed from QC labs, the line, and (in
+ * VitalChain) automatically from cold-chain excursions and CDSCO NSQ matches.
+ */
+export type DeviationType =
+  | "temperature_excursion"
+  | "oos" // out-of-specification lab result
+  | "process" // process deviation on the line
+  | "documentation"
+  | "equipment"
+  | "contamination";
+
+export type DeviationSeverity = "minor" | "major" | "critical";
+export type DeviationStatus =
+  | "open"
+  | "investigating"
+  | "capa_assigned"
+  | "closed";
+
+export interface Deviation {
+  id: string;
+  ref: string; // DEV-2026-0001
+  title: string;
+  type: DeviationType;
+  severity: DeviationSeverity;
+  status: DeviationStatus;
+  productName: string;
+  batchNo: string;
+  raisedAt: string;
+  owner: string;
+  /** Originating signal: "QC Lab", "Cold Chain", "CDSCO alert", "Line", ... */
+  source: string;
+  /** Days the deviation has been open (drives ageing / overdue flags). */
+  ageDays: number;
+  /** Linked CAPA, once one has been assigned. */
+  capaId: string | null;
+}
+
+export type CapaKind = "corrective" | "preventive";
+export type CapaStatus =
+  | "open"
+  | "in_progress"
+  | "effectiveness_check" // action done, verifying it worked
+  | "closed"
+  | "overdue";
+
+/** A Corrective and Preventive Action — the regulated response to a deviation. */
+export interface Capa {
+  id: string;
+  ref: string; // CAPA-2026-0001
+  deviationRef: string;
+  kind: CapaKind;
+  rootCause: string;
+  action: string;
+  owner: string;
+  openedAt: string;
+  dueAt: string;
+  status: CapaStatus;
+  /** 0–100 completion of the action plan. */
+  progress: number;
+  /** Post-closure effectiveness verdict (null until checked). */
+  effective: boolean | null;
+}
+
+export type BmrStatus =
+  | "in_review" // QA reviewing the batch record
+  | "released" // QP/QA released to market
+  | "on_hold" // blocked by an open deviation/CAPA
+  | "rejected";
+
+/**
+ * Batch Manufacturing Record — the GMP release dossier for a batch. Release is
+ * gated: all checklist items complete, no blocking deviations, and (for liquid
+ * orals) DEG/EG clearance on pharmacopoeial-grade excipients.
+ */
+export interface BatchRecord {
+  id: string;
+  batchId: string;
+  batchNo: string;
+  productName: string;
+  status: BmrStatus;
+  /** Release checklist progress. */
+  checksComplete: number;
+  checksTotal: number;
+  /** Open deviations blocking release. */
+  openDeviations: number;
+  reviewedBy: string;
+  /** Carried from the batch — gates liquid-oral release. */
+  degEgClear: boolean;
+  excipientGrade: "pharmacopoeial" | "uncertified";
+  releasedAt: string | null;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Warehouse Management (WMS): putaway, FEFO picking, dispatch
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Physical storage regimes within a warehouse; quarantine holds NSQ/held stock. */
+export type WarehouseZone =
+  | "ambient"
+  | "cold" // 2–8°C
+  | "frozen" // -25 to -15°C
+  | "quarantine"
+  | "dispatch";
+
+export type PickStatus =
+  | "queued"
+  | "picking"
+  | "picked"
+  | "staged"
+  | "dispatched"
+  | "short"; // could not fulfil full quantity
+
+/**
+ * A FEFO pick task: pull a quantity of a product, earliest-expiry batch first.
+ * `fefoCompliant` records whether the *correct* (earliest-expiry) batch was
+ * actually selected — the core control a WMS must enforce to prevent expiry loss.
+ */
+export interface PickTask {
+  id: string;
+  ref: string; // PCK-00001
+  orderRef: string; // sales order it belongs to
+  productName: string;
+  batchNo: string;
+  expiryDate: string;
+  zone: WarehouseZone;
+  qtyOrdered: number;
+  qtyPicked: number;
+  status: PickStatus;
+  /** Was the earliest-expiry available batch picked? */
+  fefoCompliant: boolean;
+  picker: string;
+  destination: string;
+  priority: "standard" | "urgent" | "cold_chain";
+}
+
+export type PutawayStatus = "pending" | "in_progress" | "stored";
+
+/** Inbound goods received and awaiting putaway to the correct zone. */
+export interface PutawayTask {
+  id: string;
+  ref: string;
+  productName: string;
+  batchNo: string;
+  units: number;
+  /** Zone suggested from the product's storage regime. */
+  suggestedZone: WarehouseZone;
+  status: PutawayStatus;
+  receivedAt: string;
+}
+
+/** A dispatch dock lane and the consignment currently staged at it. */
+export interface DispatchLane {
+  id: string;
+  dock: string; // "Dock A1"
+  carrier: string;
+  destination: string;
+  units: number;
+  coldChain: boolean;
+  status: "loading" | "staged" | "departed";
+  /** Dispatch cut-off time for the lane. */
+  cutoff: string;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 // Cross-cutting: unified alerts & KPIs
 // ────────────────────────────────────────────────────────────────────────────
 
-export type AlertModule = "trace" | "coldchain" | "inventory" | "compliance" | "quality";
+export type AlertModule =
+  | "trace"
+  | "coldchain"
+  | "inventory"
+  | "compliance"
+  | "quality"
+  | "warehouse"
+  | "qms";
 export type AlertSeverity = "info" | "warning" | "critical";
 
 export interface Alert {
@@ -462,5 +639,14 @@ export interface VitalChainData {
   suppliers: Supplier[];
   requirements: ComplianceRequirement[];
   qualityAlerts: QualityAlert[];
+  // QMS
+  deviations: Deviation[];
+  capas: Capa[];
+  batchRecords: BatchRecord[];
+  auditTrail: AuditEntry[];
+  // WMS
+  pickTasks: PickTask[];
+  putawayTasks: PutawayTask[];
+  dispatchLanes: DispatchLane[];
   alerts: Alert[];
 }

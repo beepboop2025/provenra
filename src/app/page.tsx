@@ -8,6 +8,8 @@ import {
   Snowflake,
   PackageSearch,
   ShieldAlert,
+  ClipboardCheck,
+  Warehouse,
   ArrowRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -15,9 +17,10 @@ import { KpiGrid } from "@/components/dashboard/kpi-card";
 import { AlertFeed } from "@/components/dashboard/alert-feed";
 import { NetworkMap } from "@/components/map/network-map";
 import { DonutChart } from "@/components/charts/charts";
-import { Badge, Card, CardHeader, Progress } from "@/components/ui/primitives";
+import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { overviewKpis } from "@/lib/kpis";
+import { fefoPickRate, pickFillRate } from "@/lib/analytics";
 import { THERAPEUTIC_COLORS } from "@/lib/data/seed";
 import { formatCompact, formatDate } from "@/lib/format";
 
@@ -41,6 +44,21 @@ export default function CommandCenter() {
   const criticalExcursions = data.excursions
     .filter((e) => e.severity !== "minor")
     .slice(0, 4);
+
+  // QMS snapshot: open deviations, critical first then oldest.
+  const sevRank = { critical: 0, major: 1, minor: 2 } as const;
+  const openDeviations = data.deviations.filter((d) => d.status !== "closed");
+  const overdueCapas = data.capas.filter((c) => c.status === "overdue");
+  const topDeviations = [...openDeviations]
+    .sort((a, b) => sevRank[a.severity] - sevRank[b.severity] || b.ageDays - a.ageDays)
+    .slice(0, 4);
+
+  // WMS snapshot: FEFO + fulfilment health.
+  const fefoAccuracy = fefoPickRate(data.pickTasks);
+  const fillRate = pickFillRate(data.pickTasks);
+  const fefoViolations = data.pickTasks.filter((t) => !t.fefoCompliant && t.status !== "short").length;
+  const shortPicks = data.pickTasks.filter((t) => t.status === "short").length;
+  const activePicks = data.pickTasks.filter((t) => t.status === "picking" || t.status === "queued").length;
 
   return (
     <div className="space-y-6">
@@ -183,6 +201,61 @@ export default function CommandCenter() {
               </li>
             )}
           </ul>
+        </Card>
+      </div>
+
+      {/* QMS & WMS snapshots */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="Quality Actions (QMS)"
+            subtitle={`${openDeviations.length} open deviations · ${overdueCapas.length} overdue CAPAs`}
+            icon={<ClipboardCheck size={16} />}
+            action={<Link href="/qms" className="text-xs text-[var(--color-brand)] hover:underline">View</Link>}
+          />
+          <ul className="divide-y divide-[var(--color-border)]">
+            {topDeviations.length ? (
+              topDeviations.map((d) => (
+                <li key={d.id} className="flex items-center justify-between gap-2 px-4 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{d.title}</p>
+                    <p className="text-[11px] text-[var(--color-faint)]">
+                      {d.ref} · {d.source} · {d.ageDays}d open
+                    </p>
+                  </div>
+                  <Badge tone={d.severity === "critical" ? "critical" : d.severity === "major" ? "danger" : "warn"}>
+                    {d.severity}
+                  </Badge>
+                </li>
+              ))
+            ) : (
+              <li className="px-4 py-6 text-center text-sm text-[var(--color-muted)]">No open deviations</li>
+            )}
+          </ul>
+        </Card>
+
+        <Card>
+          <CardHeader
+            title="Warehouse Throughput (WMS)"
+            subtitle="FEFO compliance and order fulfilment"
+            icon={<Warehouse size={16} />}
+            action={<Link href="/warehouse" className="text-xs text-[var(--color-brand)] hover:underline">View</Link>}
+          />
+          <div className="p-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <Metric label="FEFO accuracy" value={`${fefoAccuracy}%`} tone={fefoAccuracy >= 95 ? "ok" : "warn"} />
+              <Metric label="Fill rate" value={`${fillRate}%`} tone={fillRate >= 95 ? "ok" : "warn"} />
+              <Metric label="Active picks" value={activePicks} tone="info" />
+              <Metric label="Short picks" value={shortPicks} tone={shortPicks ? "danger" : "ok"} />
+            </div>
+            <div className="mt-4">
+              <div className="mb-1 flex items-center justify-between text-[11px] text-[var(--color-muted)]">
+                <span>FEFO compliance</span>
+                <span className="tabular-nums">{fefoViolations} violation{fefoViolations === 1 ? "" : "s"}</span>
+              </div>
+              <Progress value={fefoAccuracy} tone={fefoAccuracy >= 95 ? "ok" : fefoAccuracy >= 85 ? "warn" : "critical"} />
+            </div>
+          </div>
         </Card>
       </div>
 

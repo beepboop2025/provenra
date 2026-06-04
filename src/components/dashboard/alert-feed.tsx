@@ -7,6 +7,8 @@ import {
   ScanLine,
   AlertTriangle,
   FlaskConical,
+  Warehouse,
+  ClipboardCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/primitives";
 import { formatRelative } from "@/lib/format";
@@ -18,6 +20,8 @@ const moduleIcon: Record<AlertModule, React.ComponentType<{ size?: number }>> = 
   inventory: PackageSearch,
   compliance: ShieldCheck,
   quality: FlaskConical,
+  warehouse: Warehouse,
+  qms: ClipboardCheck,
 };
 
 const sevTone = {

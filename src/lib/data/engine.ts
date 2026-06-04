@@ -1,17 +1,24 @@
 import {
+  CAPA_ACTIONS,
   CARRIERS,
+  DOCKS,
   INDIAN_STATES,
   INTL_NODES,
   IN_DEMAND_CENTERS,
   IN_HUBS,
   MANUFACTURERS,
   MARKETS,
+  PICKERS,
   PRODUCTS,
+  QA_OFFICERS,
   QUALITY_DEFECTS,
   RECALL_REASONS,
+  ROOT_CAUSES,
   TEST_LABS,
 } from "@/lib/data/seed";
 import {
+  capaEffectiveStatus,
+  capaSlaDays,
   excursionSeverity,
   expiringUnits,
   meanKineticTemperature,
@@ -23,14 +30,23 @@ import { counterfeitRiskScore } from "@/lib/risk";
 import { hashSeed, mulberry32, pick, clamp } from "@/lib/utils";
 import type {
   Alert,
+  AuditEntry,
   Batch,
+  BatchRecord,
+  Capa,
   ChainEvent,
   ComplianceRequirement,
   DemandPoint,
+  Deviation,
+  DeviationSeverity,
+  DeviationType,
+  DispatchLane,
   Excursion,
   Facility,
   FacilityType,
+  PickTask,
   Product,
+  PutawayTask,
   QualityAlert,
   Recall,
   SensorReading,
@@ -40,6 +56,7 @@ import type {
   StockPosition,
   Supplier,
   VitalChainData,
+  WarehouseZone,
 } from "@/lib/types";
 
 /**
@@ -542,7 +559,10 @@ function buildAlerts(
   recalls: Recall[],
   serials: SerialUnit[],
   requirements: ComplianceRequirement[],
-  qualityAlerts: QualityAlert[]
+  qualityAlerts: QualityAlert[],
+  capas: Capa[],
+  batchRecords: BatchRecord[],
+  pickTasks: PickTask[]
 ): Alert[] {
   const out: Alert[] = [];
 
@@ -584,7 +604,9 @@ function buildAlerts(
       severity: s.riskScore >= 80 ? "critical" : "warning",
       title: `${s.essential ? "Essential medicine" : "Product"} shortage risk — ${s.productName}`,
       detail: `Risk ${s.riskScore}/100. ${s.affectedFacilities} facilities below reorder point.`,
-      timestamp: addDays(NOW, -Math.random()),
+      // Deterministic offset (not Math.random) so server and client render the
+      // same timestamp — avoids a React hydration mismatch on the alert feed.
+      timestamp: addDays(NOW, -((hashSeed(s.id) % 1000) / 1000)),
       acknowledged: false,
     })
   );
@@ -626,7 +648,425 @@ function buildAlerts(
     })
   );
 
+  // QMS: overdue CAPAs (past their severity-driven SLA) — a regulatory exposure.
+  capas.filter((c) => c.status === "overdue").slice(0, 4).forEach((c) =>
+    out.push({
+      id: `ALR-CAPA-${c.id}`,
+      module: "qms",
+      severity: "critical",
+      title: `Overdue CAPA — ${c.ref}`,
+      detail: `${c.kind} action for ${c.deviationRef} past due (${c.progress}% complete). Owner: ${c.owner}.`,
+      timestamp: c.dueAt,
+      acknowledged: false,
+    })
+  );
+
+  // QMS: batch releases blocked / rejected (DEG-EG, uncertified excipient, holds).
+  batchRecords
+    .filter((b) => b.status === "on_hold" || b.status === "rejected")
+    .slice(0, 3)
+    .forEach((b) =>
+      out.push({
+        id: `ALR-BMR-${b.id}`,
+        module: "qms",
+        severity: b.status === "rejected" || !b.degEgClear ? "critical" : "warning",
+        title: `${b.status === "rejected" ? "Batch rejected" : "Batch release on hold"} — ${b.productName}`,
+        detail: `Batch ${b.batchNo}: ${!b.degEgClear ? "DEG/EG not cleared. " : ""}${b.excipientGrade === "uncertified" ? "Uncertified excipient. " : ""}${b.openDeviations} open deviation(s).`,
+        timestamp: addDays(NOW, -((hashSeed(b.id) % 1000) / 1000)),
+        acknowledged: false,
+      })
+    );
+
+  // WMS: FEFO violations — older stock left behind, future expiry write-off risk.
+  const fefoViolations = pickTasks.filter((t) => !t.fefoCompliant && t.status !== "short");
+  if (fefoViolations.length) {
+    out.push({
+      id: "ALR-WMS-fefo",
+      module: "warehouse",
+      severity: "warning",
+      title: `${fefoViolations.length} FEFO pick violation${fefoViolations.length > 1 ? "s" : ""}`,
+      detail: `Picks pulled a later-expiry batch over an earlier one (e.g. ${fefoViolations[0].productName}, ${fefoViolations[0].ref}). Older stock at expiry-loss risk.`,
+      timestamp: addDays(NOW, -0.1),
+      acknowledged: false,
+    });
+  }
+
+  // WMS: short picks — orders that could not be fully fulfilled.
+  const shortPicks = pickTasks.filter((t) => t.status === "short");
+  if (shortPicks.length) {
+    out.push({
+      id: "ALR-WMS-short",
+      module: "warehouse",
+      severity: "warning",
+      title: `${shortPicks.length} short pick${shortPicks.length > 1 ? "s" : ""} — fulfilment gap`,
+      detail: `Insufficient stock to fully pick ${shortPicks.length} order line(s), incl. ${shortPicks[0].productName} (${shortPicks[0].orderRef}).`,
+      timestamp: addDays(NOW, -0.15),
+      acknowledged: false,
+    });
+  }
+
   return out.sort((a, b) => +new Date(b.timestamp) - +new Date(a.timestamp));
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// QMS builders: deviations → CAPA, batch records, audit trail
+// ────────────────────────────────────────────────────────────────────────────
+
+const sevFromExcursion = (s: Excursion["severity"]): DeviationSeverity =>
+  s === "critical" ? "critical" : s === "major" ? "major" : "minor";
+
+/**
+ * Deviations are not invented in a vacuum — they are raised from real signals:
+ * stability-impacting cold-chain excursions, CDSCO/QC quality failures matched to
+ * held inventory, and a baseline of line/equipment/documentation events. This
+ * mirrors how a real QMS aggregates deviations from across the plant and chain.
+ */
+function buildDeviations(
+  excursions: Excursion[],
+  qualityAlerts: QualityAlert[],
+  batches: Batch[],
+  products: Product[]
+): Deviation[] {
+  const out: Deviation[] = [];
+  let seq = 1;
+  const ref = () => `DEV-2026-${String(seq++).padStart(4, "0")}`;
+
+  // 1) From stability-impacting excursions.
+  excursions
+    .filter((e) => e.stabilityImpacted)
+    .slice(0, 6)
+    .forEach((e) => {
+      const rnd = mulberry32(hashSeed(e.id + "dev"));
+      const age = Math.floor(rnd() * 25) + 1;
+      const severity = sevFromExcursion(e.severity);
+      const status =
+        rnd() > 0.7 ? "closed" : rnd() > 0.4 ? "capa_assigned" : rnd() > 0.5 ? "investigating" : "open";
+      out.push({
+        id: `DEVN-EXC-${e.id}`,
+        ref: ref(),
+        title: `${e.kind === "freeze" ? "Freeze" : "Heat"} excursion — ${e.productName}`,
+        type: "temperature_excursion",
+        severity,
+        status,
+        productName: e.productName,
+        batchNo: e.shipmentRef,
+        raisedAt: addDays(NOW, -age),
+        owner: pick(QA_OFFICERS, rnd()),
+        source: "Cold Chain",
+        ageDays: age,
+        capaId: status === "capa_assigned" || status === "closed" ? `CAPA-EXC-${e.id}` : null,
+      });
+    });
+
+  // 2) From quality failures held in inventory (NSQ/contamination/OOS).
+  qualityAlerts
+    .filter((q) => q.inInventory && q.action !== "cleared")
+    .slice(0, 6)
+    .forEach((q) => {
+      const rnd = mulberry32(hashSeed(q.id + "dev"));
+      const age = Math.floor(rnd() * 30) + 2;
+      const severity: DeviationSeverity =
+        q.defect === "deg_eg" || q.defect === "spurious" || q.defect === "nitrosamine"
+          ? "critical"
+          : q.defect === "adulterated"
+            ? "major"
+            : "major";
+      const type: DeviationType = q.defect === "adulterated" ? "contamination" : "oos";
+      const status = q.action === "recall_initiated" ? "capa_assigned" : rnd() > 0.5 ? "investigating" : "open";
+      out.push({
+        id: `DEVN-QA-${q.id}`,
+        ref: ref(),
+        title: `${q.description.split(" — ")[0]} — ${q.productName}`,
+        type,
+        severity,
+        status,
+        productName: q.productName,
+        batchNo: q.batchNo,
+        raisedAt: q.flaggedAt,
+        owner: pick(QA_OFFICERS, rnd()),
+        source: q.source.includes("CDSCO") ? "CDSCO alert" : "QC Lab",
+        ageDays: age,
+        capaId: status === "capa_assigned" ? `CAPA-QA-${q.id}` : null,
+      });
+    });
+
+  // 3) Baseline line/equipment/documentation deviations on real batches.
+  const baselineTypes: DeviationType[] = ["process", "equipment", "documentation"];
+  for (let i = 0; i < 5; i++) {
+    const rnd = mulberry32(hashSeed("devbase" + i));
+    const batch = pick(batches, rnd());
+    const product = products.find((p) => p.id === batch.productId)!;
+    const type = baselineTypes[i % baselineTypes.length];
+    const age = Math.floor(rnd() * 40) + 1;
+    const severity: DeviationSeverity = rnd() > 0.8 ? "major" : "minor";
+    const status = rnd() > 0.55 ? "closed" : rnd() > 0.5 ? "capa_assigned" : "investigating";
+    out.push({
+      id: `DEVN-BASE-${i}`,
+      ref: ref(),
+      title: `${type === "process" ? "Process" : type === "equipment" ? "Equipment" : "Documentation"} deviation — ${product.name}`,
+      type,
+      severity,
+      status,
+      productName: product.name,
+      batchNo: batch.batchNo,
+      raisedAt: addDays(NOW, -age),
+      owner: pick(QA_OFFICERS, rnd()),
+      source: "Line",
+      ageDays: age,
+      capaId: status === "capa_assigned" || status === "closed" ? `CAPA-BASE-${i}` : null,
+    });
+  }
+
+  return out.sort((a, b) => +new Date(b.raisedAt) - +new Date(a.raisedAt));
+}
+
+/** One CAPA per deviation that has a `capaId`, with SLA-driven due dates. */
+function buildCapas(deviations: Deviation[]): Capa[] {
+  return deviations
+    .filter((d) => d.capaId)
+    .map((d, i) => {
+      const rnd = mulberry32(hashSeed(d.capaId! + "capa"));
+      const kind = rnd() > 0.55 ? "corrective" : "preventive";
+      const openedAt = d.raisedAt;
+      const dueAt = addDays(new Date(openedAt), capaSlaDays(d.severity));
+      const closed = d.status === "closed";
+      const progress = closed ? 100 : Math.floor(rnd() * 80) + 5;
+      const baseStatus = closed
+        ? "closed"
+        : progress > 70
+          ? "effectiveness_check"
+          : progress > 20
+            ? "in_progress"
+            : "open";
+      // Promote to "overdue" if past the SLA due date and not yet closed.
+      const status = capaEffectiveStatus(baseStatus, dueAt);
+      return {
+        id: d.capaId!,
+        ref: `CAPA-2026-${String(i + 1).padStart(4, "0")}`,
+        deviationRef: d.ref,
+        kind,
+        rootCause: pick(ROOT_CAUSES, rnd()),
+        action: pick(CAPA_ACTIONS, rnd()),
+        owner: d.owner,
+        openedAt,
+        dueAt,
+        status,
+        progress,
+        effective: closed ? rnd() > 0.2 : null,
+      } satisfies Capa;
+    });
+}
+
+/**
+ * Batch Manufacturing Records (release dossiers). Release is GMP-gated: a batch
+ * can only be "released" with all checks complete, no open deviations, and (for
+ * liquid orals) DEG/EG clearance on pharmacopoeial-grade excipients.
+ */
+function buildBatchRecords(
+  batches: Batch[],
+  products: Product[],
+  deviations: Deviation[]
+): BatchRecord[] {
+  // Map open deviations onto their batch numbers.
+  const openByBatch = new Map<string, number>();
+  for (const d of deviations) {
+    if (d.status !== "closed") openByBatch.set(d.batchNo, (openByBatch.get(d.batchNo) ?? 0) + 1);
+  }
+
+  return batches
+    .filter((b) => b.status !== "expired")
+    .slice(0, 16)
+    .map((b) => {
+      const product = products.find((p) => p.id === b.productId)!;
+      const rnd = mulberry32(hashSeed(b.id + "bmr"));
+      const checksTotal = 12;
+      const openDeviations = openByBatch.get(b.batchNo) ?? 0;
+      const liquid = product.dosageForm === "syrup" || product.dosageForm === "injection";
+      const degBlock = liquid && !b.degEgClear;
+      const blocked = openDeviations > 0 || degBlock || b.excipientGrade === "uncertified";
+
+      let status: BatchRecord["status"];
+      let checksComplete: number;
+      let releasedAt: string | null = null;
+      if (b.status === "quarantined" || degBlock) {
+        status = "on_hold";
+        checksComplete = Math.floor(rnd() * 6) + 4;
+      } else if (b.excipientGrade === "uncertified") {
+        status = "rejected";
+        checksComplete = Math.floor(rnd() * 8) + 2;
+      } else if (blocked || rnd() > 0.65) {
+        status = "in_review";
+        checksComplete = Math.floor(rnd() * 4) + 7;
+      } else {
+        status = "released";
+        checksComplete = checksTotal;
+        releasedAt = addDays(NOW, -Math.floor(rnd() * 30) - 1);
+      }
+
+      return {
+        id: `BMR-${b.id}`,
+        batchId: b.id,
+        batchNo: b.batchNo,
+        productName: product.name,
+        status,
+        checksComplete,
+        checksTotal,
+        openDeviations,
+        reviewedBy: pick(QA_OFFICERS, rnd()),
+        degEgClear: b.degEgClear,
+        excipientGrade: b.excipientGrade,
+        releasedAt,
+      } satisfies BatchRecord;
+    });
+}
+
+/**
+ * A tamper-evident, hash-chained audit trail of QMS actions. Each entry's hash
+ * folds in the previous hash — altering any historical entry breaks every hash
+ * downstream, which is exactly what GMP/21-CFR-Part-11 audit trails require.
+ */
+function buildAuditTrail(deviations: Deviation[], capas: Capa[], recalls: Recall[]): AuditEntry[] {
+  type Raw = { timestamp: string; actor: string; action: string; entity: string };
+  const raw: Raw[] = [];
+
+  deviations.forEach((d) => {
+    raw.push({ timestamp: d.raisedAt, actor: d.owner, action: `Raised deviation (${d.severity})`, entity: d.ref });
+    if (d.status === "closed")
+      raw.push({ timestamp: addDays(new Date(d.raisedAt), d.ageDays), actor: d.owner, action: "Closed deviation", entity: d.ref });
+  });
+  capas.forEach((c) => {
+    raw.push({ timestamp: c.openedAt, actor: c.owner, action: `Opened ${c.kind} CAPA`, entity: c.ref });
+    if (c.status === "closed")
+      raw.push({ timestamp: c.dueAt, actor: c.owner, action: `Closed CAPA (effective: ${c.effective ? "yes" : "no"})`, entity: c.ref });
+  });
+  recalls.forEach((r) => {
+    raw.push({ timestamp: r.initiatedAt, actor: "Regulatory Affairs", action: `Initiated Class ${r.recallClass} recall`, entity: r.ref });
+  });
+
+  raw.sort((a, b) => +new Date(a.timestamp) - +new Date(b.timestamp));
+
+  let prevHash = "00000000";
+  const out: AuditEntry[] = raw.map((e, i) => {
+    const payload = `${e.timestamp}|${e.actor}|${e.action}|${e.entity}`;
+    const hash = chainHash(prevHash, payload + i);
+    const entry: AuditEntry = { id: `AUD-${i}`, ...e, hash, prevHash };
+    prevHash = hash;
+    return entry;
+  });
+  // Newest first for display; the chain itself was built oldest→newest.
+  return out.reverse();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// WMS builders: putaway, FEFO picking, dispatch
+// ────────────────────────────────────────────────────────────────────────────
+
+const zoneForStorage = (storage: Product["storage"]): WarehouseZone =>
+  storage === "refrigerated" || storage === "cool"
+    ? "cold"
+    : storage === "frozen"
+      ? "frozen"
+      : "ambient";
+
+/**
+ * FEFO pick tasks. For each task we look at all sellable batches of a product and
+ * record whether the picker pulled the *earliest-expiry* one. We deliberately
+ * inject a minority of FEFO violations so the warehouse FEFO-compliance control
+ * has something to surface — in a real WMS these are the picks that quietly
+ * strand older stock and turn into expiry write-offs.
+ */
+function buildPickTasks(products: Product[], batches: Batch[]): PickTask[] {
+  const out: PickTask[] = [];
+  for (let i = 0; i < 22; i++) {
+    const rnd = mulberry32(hashSeed("pick" + i));
+    const product = pick(products, rnd());
+    const sellable = batches
+      .filter((b) => b.productId === product.id && (b.status === "released" || b.status === "in_distribution"))
+      .sort((a, b) => +new Date(a.expiryDate) - +new Date(b.expiryDate));
+    if (!sellable.length) continue;
+
+    // FEFO-correct choice is index 0; ~20% of picks violate FEFO.
+    const violateFefo = sellable.length > 1 && rnd() > 0.8;
+    const chosen = violateFefo ? sellable[1 + Math.floor(rnd() * (sellable.length - 1))] : sellable[0];
+    const fefoCompliant = chosen.id === sellable[0].id;
+
+    const qtyOrdered = Math.floor(rnd() * 1800) + 200;
+    const roll = rnd();
+    const status: PickTask["status"] =
+      roll > 0.85 ? "short" : roll > 0.65 ? "dispatched" : roll > 0.45 ? "staged" : roll > 0.25 ? "picking" : "queued";
+    const qtyPicked =
+      status === "short"
+        ? Math.floor(qtyOrdered * (0.3 + rnd() * 0.5))
+        : status === "queued" || status === "picking"
+          ? Math.floor(qtyOrdered * rnd())
+          : qtyOrdered;
+    const zone = zoneForStorage(product.storage);
+    const priority: PickTask["priority"] =
+      zone !== "ambient" ? "cold_chain" : product.essential && rnd() > 0.5 ? "urgent" : "standard";
+
+    out.push({
+      id: `PCK-${String(i).padStart(5, "0")}`,
+      ref: `PCK-${10000 + i}`,
+      orderRef: `SO-${44000 + Math.floor(rnd() * 900)}`,
+      productName: product.name,
+      batchNo: chosen.batchNo,
+      expiryDate: chosen.expiryDate,
+      zone,
+      qtyOrdered,
+      qtyPicked,
+      status,
+      fefoCompliant,
+      picker: pick(PICKERS, rnd()),
+      destination: ["Delhi", "Mumbai", "Chennai", "Kolkata", "Pune", "Hyderabad"][i % 6],
+      priority,
+    });
+  }
+  return out;
+}
+
+/** Inbound batches awaiting putaway to their correct (temperature) zone. */
+function buildPutawayTasks(products: Product[], batches: Batch[]): PutawayTask[] {
+  return batches
+    .filter((b) => b.status === "released" || b.status === "in_production")
+    .slice(0, 10)
+    .map((b, i) => {
+      const product = products.find((p) => p.id === b.productId)!;
+      const rnd = mulberry32(hashSeed(b.id + "put"));
+      const status: PutawayTask["status"] = rnd() > 0.6 ? "stored" : rnd() > 0.4 ? "in_progress" : "pending";
+      return {
+        id: `PUT-${i}`,
+        ref: `GRN-${7700 + i}`,
+        productName: product.name,
+        batchNo: b.batchNo,
+        units: Math.floor(rnd() * 40000) + 2000,
+        suggestedZone: zoneForStorage(product.storage),
+        status,
+        receivedAt: addDays(NOW, -Math.floor(rnd() * 5)),
+      } satisfies PutawayTask;
+    });
+}
+
+/** Dispatch dock lanes built from outbound shipments. */
+function buildDispatchLanes(shipments: Shipment[], products: Product[]): DispatchLane[] {
+  return shipments
+    .filter((s) => s.status !== "delivered")
+    .slice(0, 5)
+    .map((s, i) => {
+      const rnd = mulberry32(hashSeed(s.id + "dock"));
+      const product = products.find((p) => p.id === s.productId);
+      const status: DispatchLane["status"] =
+        s.progress > 0.05 ? "departed" : rnd() > 0.5 ? "staged" : "loading";
+      return {
+        id: `LANE-${i}`,
+        dock: DOCKS[i % DOCKS.length],
+        carrier: s.carrier.split(" ")[0],
+        destination: s.destination.location.city,
+        units: s.units,
+        coldChain: !!product?.tempRange,
+        status,
+        cutoff: addDays(NOW, rnd() * 0.5),
+      } satisfies DispatchLane;
+    });
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -651,7 +1091,29 @@ export function getData(): VitalChainData {
   const suppliers = buildSuppliers(facilities);
   const requirements = buildRequirements();
   const qualityAlerts = buildQualityAlerts(products, batches);
-  const alerts = buildAlerts(excursions, shortages, recalls, serials, requirements, qualityAlerts);
+
+  // QMS
+  const deviations = buildDeviations(excursions, qualityAlerts, batches, products);
+  const capas = buildCapas(deviations);
+  const batchRecords = buildBatchRecords(batches, products, deviations);
+  const auditTrail = buildAuditTrail(deviations, capas, recalls);
+
+  // WMS
+  const pickTasks = buildPickTasks(products, batches);
+  const putawayTasks = buildPutawayTasks(products, batches);
+  const dispatchLanes = buildDispatchLanes(shipments, products);
+
+  const alerts = buildAlerts(
+    excursions,
+    shortages,
+    recalls,
+    serials,
+    requirements,
+    qualityAlerts,
+    capas,
+    batchRecords,
+    pickTasks
+  );
 
   _cache = {
     markets: MARKETS,
@@ -667,6 +1129,13 @@ export function getData(): VitalChainData {
     suppliers,
     requirements,
     qualityAlerts,
+    deviations,
+    capas,
+    batchRecords,
+    auditTrail,
+    pickTasks,
+    putawayTasks,
+    dispatchLanes,
     alerts,
   };
   return _cache;

@@ -1,4 +1,5 @@
 import { getData, spark } from "@/lib/data/engine";
+import { fefoPickRate } from "@/lib/analytics";
 import { formatCompact, formatPct } from "@/lib/format";
 import type { Kpi, VitalChainData } from "@/lib/types";
 
@@ -17,6 +18,12 @@ export function overviewKpis(d: VitalChainData = getData()): Kpi[] {
     (d.shipments.filter((s) => s.status === "delivered" || s.status === "in_transit").length /
       Math.max(d.shipments.length, 1)) *
     100;
+  const fefoAccuracy = fefoPickRate(d.pickTasks);
+  const openDeviations = d.deviations.filter((dv) => dv.status !== "closed").length;
+  const overdueCapas = d.capas.filter((c) => c.status === "overdue").length;
+  const awaitingRelease = d.batchRecords.filter(
+    (b) => b.status === "in_review" || b.status === "on_hold"
+  ).length;
 
   return [
     {
@@ -74,6 +81,34 @@ export function overviewKpis(d: VitalChainData = getData()): Kpi[] {
       delta: 7.5,
       deltaGood: "down",
       spark: spark("nsq", 12, false),
+    },
+    {
+      label: "FEFO Pick Accuracy",
+      value: formatPct(fefoAccuracy, 0),
+      delta: 1.2,
+      deltaGood: "up",
+      spark: spark("fefo", 12, true),
+    },
+    {
+      label: "Open Deviations",
+      value: String(openDeviations),
+      delta: 5.5,
+      deltaGood: "down",
+      spark: spark("devs", 12, false),
+    },
+    {
+      label: "Overdue CAPAs",
+      value: String(overdueCapas),
+      delta: overdueCapas > 0 ? 30 : -40,
+      deltaGood: "down",
+      spark: spark("capa", 12, false),
+    },
+    {
+      label: "Batches Awaiting Release",
+      value: String(awaitingRelease),
+      delta: 3.0,
+      deltaGood: "down",
+      spark: spark("bmr", 12, false),
     },
   ];
 }

@@ -210,3 +210,54 @@ export const RECALL_REASONS = [
   "Nitrosamine impurity above acceptable intake",
   "Sterility assurance failure",
 ] as const;
+
+// ── QMS reference data ───────────────────────────────────────────────────────
+
+/** QA personnel who review batch records and own deviations/CAPAs. */
+export const QA_OFFICERS = [
+  "R. Iyer (QA Head)",
+  "S. Banerjee (QC Lead)",
+  "M. Patel (QA Officer)",
+  "A. Khan (Microbiology)",
+  "P. Nair (Validation)",
+  "D. Sharma (Regulatory)",
+] as const;
+
+/** Investigation root causes (the "why" behind a deviation). */
+export const ROOT_CAUSES = [
+  "Reefer unit thermostat drift during transit",
+  "Granulation end-point variability (process)",
+  "Analyst calculation error in assay",
+  "HVAC pressure differential out of range",
+  "Excipient supplier change not fully validated",
+  "Calibration overdue on dissolution apparatus",
+  "Gowning SOP not followed in fill area",
+  "Stability chamber excursion during study",
+] as const;
+
+/** Corrective / preventive action descriptions. */
+export const CAPA_ACTIONS = [
+  "Requalify reefer fleet; add redundant temperature loggers",
+  "Tighten in-process controls and retrain line operators",
+  "Implement second-person verification on QC calculations",
+  "Recalibrate and add interlock to HVAC differential",
+  "Re-validate excipient and add incoming-DEG/EG screening",
+  "Reinstate calibration schedule with automated reminders",
+  "Refresher gowning training and area access audit",
+  "Revise stability protocol; add chamber alarm escalation",
+] as const;
+
+// ── WMS reference data ───────────────────────────────────────────────────────
+
+/** Warehouse pickers (operators executing pick tasks). */
+export const PICKERS = [
+  "Ravi K.",
+  "Sunita D.",
+  "Imran S.",
+  "Lakshmi N.",
+  "Vijay P.",
+  "Anita R.",
+] as const;
+
+/** Dispatch dock identifiers. */
+export const DOCKS = ["Dock A1", "Dock A2", "Dock B1", "Dock B2", "Dock C1"] as const;
