@@ -121,21 +121,22 @@ async function getText(url: string): Promise<string | null> {
   }
 }
 
-/** The listing page renders month labels (e.g. "April-2025") in its HTML even
- *  though the PDF links are JS-rendered — parse the newest month from those. */
-function latestMonth(html: string): { idx: number; year: number; label: string } | null {
+type MonthRef = { idx: number; year: number; label: string };
+
+/** The listing renders month labels (e.g. "April-2025") in its HTML even though
+ *  the PDF links are JS-rendered — parse them all, newest first, deduped. */
+function parseMonths(html: string): MonthRef[] {
   const re = /(january|february|march|april|may|june|july|august|september|october|november|december)[\s-]+(20\d{2})/gi;
+  const seen = new Map<number, MonthRef>();
   let m: RegExpExecArray | null;
-  let best: { idx: number; year: number; label: string; score: number } | null = null;
   while ((m = re.exec(html))) {
     const idx = MONTHS.indexOf(m[1].toLowerCase());
     const year = Number(m[2]);
+    if (idx < 0) continue;
     const score = year * 12 + idx;
-    if (idx >= 0 && (!best || score > best.score)) {
-      best = { idx, year, label: `${cap(m[1])} ${year}`, score };
-    }
+    if (!seen.has(score)) seen.set(score, { idx, year, label: `${cap(m[1])} ${year}` });
   }
-  return best;
+  return [...seen.entries()].sort((a, b) => b[0] - a[0]).map(([, v]) => v);
 }
 
 /** Filename casing is inconsistent across months — try the known variants. */
@@ -187,7 +188,8 @@ function jsonArray(text: string): Record<string, unknown>[] {
  *  is set, otherwise return a single linked pointer item. Always fault-tolerant. */
 export async function collectCdsco(): Promise<IntelItem[]> {
   const html = await getText(CDSCO_LISTING);
-  const latest = html ? latestMonth(html) : null;
+  // parseMonths returns all month labels newest-first; take the newest.
+  const latest = (html ? parseMonths(html) : [])[0] ?? null;
 
   // Could not even read the listing → link to the portal.
   if (!latest) {
