@@ -6,6 +6,7 @@ const SITE_URL = "https://vitalchain.vercel.app";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "", // Command Center
+    "/intro",
     "/trace",
     "/quality",
     "/qms",
