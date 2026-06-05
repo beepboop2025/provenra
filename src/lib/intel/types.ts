@@ -22,6 +22,8 @@ export interface IntelItem {
   source: string;
   severity: IntelSeverity;
   region: string;
+  /** Link to the underlying record/document, when available (e.g. CDSCO PDF). */
+  url?: string;
 }
 
 /** The analyst agent's consolidated read of the day's intel. */

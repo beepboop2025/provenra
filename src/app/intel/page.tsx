@@ -47,7 +47,7 @@ export default async function IntelPage() {
           <p className="mt-2 text-sm text-[var(--color-fg)]">
             {items.length} live items · {recalls.length} recalls · {shortages.length} shortages
           </p>
-          <p className="mt-1 text-[11px] text-[var(--color-faint)]">Source: openFDA (FDA RES + Drug Shortages)</p>
+          <p className="mt-1 text-[11px] text-[var(--color-faint)]">Sources: openFDA (US) + CDSCO NSQ alerts (India)</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 text-xs font-medium text-[var(--color-muted)]">
@@ -124,8 +124,19 @@ export default async function IntelPage() {
                     <td className="px-4 py-2.5">
                       <Badge tone={it.kind === "recall" ? "danger" : "warn"}>{it.kind}</Badge>
                     </td>
-                    <td className="px-4 py-2.5 font-medium">{it.title}</td>
-                    <td className="px-4 py-2.5 text-xs text-[var(--color-muted)]">{it.org}</td>
+                    <td className="px-4 py-2.5 font-medium">
+                      {it.url ? (
+                        <a href={it.url} target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand)] hover:underline">
+                          {it.title}
+                        </a>
+                      ) : (
+                        it.title
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-[var(--color-muted)]">
+                      {it.org}
+                      <span className="ml-1.5 rounded bg-[var(--color-surface-2)] px-1 text-[10px] text-[var(--color-faint)]">{it.region}</span>
+                    </td>
                     <td className="px-4 py-2.5 max-w-sm text-xs text-[var(--color-muted)]">
                       <span className="line-clamp-2">{it.reason}</span>
                       <span className="mt-0.5 block text-[10px] text-[var(--color-faint)]">{it.classification} · {it.source}</span>
@@ -143,8 +154,9 @@ export default async function IntelPage() {
       </Card>
 
       <p className="text-center text-[11px] text-[var(--color-faint)]">
-        Data sourced from openFDA (US FDA), refreshed automatically on Vercel. Figures are real public regulatory
-        records and may lag the source. The India CDSCO feed (PDF) is on the roadmap.
+        Data sourced from openFDA (US FDA) and CDSCO NSQ alerts (India), refreshed automatically on Vercel. Figures are
+        real public regulatory records and may lag the source. CDSCO rows are auto-extracted from the monthly PDF when
+        the Claude analyst key is set; otherwise the latest alert is linked directly.
       </p>
     </div>
   );
