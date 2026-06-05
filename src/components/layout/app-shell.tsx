@@ -14,6 +14,7 @@ import {
   Warehouse,
   ClipboardCheck,
   Clapperboard,
+  Radar,
   Bell,
   Globe,
   Menu,
@@ -33,6 +34,7 @@ const NAV = [
   { href: "/warehouse", label: "Warehouse (WMS)", icon: Warehouse, module: "warehouse" },
   { href: "/inventory", label: "Shortage & Inventory", icon: PackageSearch, module: "inventory" },
   { href: "/compliance", label: "Recall & Compliance", icon: ShieldCheck, module: "compliance" },
+  { href: "/intel", label: "Global Intel (AI)", icon: Radar, module: null },
   { href: "/verify", label: "Verify a Unit", icon: Activity, module: null },
   { href: "/intro", label: "Intro", icon: Clapperboard, module: null },
 ] as const;
