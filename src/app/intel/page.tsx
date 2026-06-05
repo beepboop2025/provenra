@@ -59,7 +59,7 @@ export default async function IntelPage() {
           <p className="mt-1 text-[11px] text-[var(--color-faint)]">
             {briefing.byAI
               ? `Updated ${formatRelative(briefing.generatedAt)}`
-              : "Set ANTHROPIC_API_KEY on Vercel to enable Claude"}
+              : "Set GEMINI_API_KEY (free) or ANTHROPIC_API_KEY on Vercel to enable"}
           </p>
         </Card>
         <Card className="p-4">
@@ -156,7 +156,7 @@ export default async function IntelPage() {
       <p className="text-center text-[11px] text-[var(--color-faint)]">
         Data sourced from openFDA (US FDA) and CDSCO NSQ alerts (India), refreshed automatically on Vercel. Figures are
         real public regulatory records and may lag the source. CDSCO rows are auto-extracted from the monthly PDF when
-        the Claude analyst key is set; otherwise the latest alert is linked directly.
+        an LLM key (free Gemini or Anthropic) is set; otherwise the latest alert is linked directly.
       </p>
     </div>
   );

@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { llmText, llmInfo } from "@/lib/intel/llm";
 import type { IntelItem, IntelSeverity } from "@/lib/intel/types";
 
 /**
@@ -225,30 +225,21 @@ export async function collectCdsco(): Promise<IntelItem[]> {
   };
   if (!found) return [pointer];
 
-  // Extract individual flagged batches with Claude (PDF-native) when enabled.
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || found.buf.byteLength > 9_000_000) return [pointer];
+  // Extract individual flagged batches via the configured LLM (Gemini/Claude,
+  // both PDF-native) when enabled. Falls back to the linked pointer otherwise.
+  if (!llmInfo().enabled || found.buf.byteLength > 9_000_000) return [pointer];
 
   try {
-    const client = new Anthropic({ apiKey });
     const b64 = Buffer.from(found.buf).toString("base64");
-    const resp = await client.messages.create({
-      model: "claude-opus-4-8",
-      max_tokens: 2500,
-      system: [{ type: "text", text: CDSCO_SYS, cache_control: { type: "ephemeral" } }],
-      messages: [{
-        role: "user",
-        content: [
-          { type: "document", source: { type: "base64", media_type: "application/pdf", data: b64 } },
-          { type: "text", text: `Extract up to 12 flagged drugs from this CDSCO NSQ alert for ${latest.label}. Return only the JSON array.` },
-        ],
-      }],
+    const res = await llmText({
+      system: CDSCO_SYS,
+      user: `Extract up to 12 flagged drugs from this CDSCO NSQ alert for ${latest.label}. Return only the JSON array.`,
+      pdfBase64: b64,
+      json: true,
+      maxTokens: 2500,
     });
-    const text = resp.content
-      .filter((b): b is Anthropic.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("");
-    const rows = jsonArray(text);
+    if (!res) return [pointer];
+    const rows = jsonArray(res.text);
     if (rows.length === 0) return [pointer];
 
     return rows.slice(0, 12).map((r, i) => {
