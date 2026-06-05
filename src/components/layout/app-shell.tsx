@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   for (const a of unacked) counts[a.module] = (counts[a.module] ?? 0) + 1;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="relative z-10 flex min-h-screen">
       {/* Sidebar */}
       <aside
         className={cn(
@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Activity size={20} strokeWidth={2.4} />
           </div>
           <div>
-            <div className="text-[15px] font-bold leading-none tracking-tight">
+            <div className="font-display text-[15px] font-bold leading-none tracking-tight">
               Vital<span className="text-[var(--color-brand)]">Chain</span>
             </div>
             <div className="mt-0.5 text-[10px] uppercase tracking-wider text-[var(--color-faint)]">
@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className={cn(
                   "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   active
-                    ? "bg-[var(--color-brand)]/12 text-[var(--color-brand)]"
+                    ? "bg-[var(--color-brand)]/12 text-[var(--color-brand)] shadow-[inset_2px_0_0_0_var(--color-brand)]"
                     : "text-[var(--color-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-fg)]"
                 )}
               >

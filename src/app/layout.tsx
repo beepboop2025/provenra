@@ -1,16 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fira_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/layout/app-shell";
 
-const geistSans = Geist({
+// Fira pairing (ui-ux-pro-max recommendation for data/technical dashboards):
+// Fira Sans for readable body, Fira Code as the monospaced display/data face —
+// monospace headings + tabular figures read as precision instrumentation.
+// Reuses the existing --font-geist-* variable names so the whole design system
+// picks them up with no token renames.
+const firaSans = Fira_Sans({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
+const firaCode = Fira_Code({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const SITE_URL = "https://vitalchain.vercel.app";
@@ -133,7 +140,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${firaSans.variable} ${firaCode.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <script

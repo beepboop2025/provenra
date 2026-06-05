@@ -12,7 +12,7 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
   const color = isGood ? "var(--color-ok)" : "var(--color-danger)";
 
   return (
-    <Card className="vc-rise p-4">
+    <Card className="p-4">
       <div className="flex items-start justify-between gap-2">
         <span className="text-xs font-medium text-[var(--color-muted)]">
           {kpi.label}
@@ -37,7 +37,7 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
 
 export function KpiGrid({ kpis }: { kpis: Kpi[] }) {
   return (
-    <div className={cn("grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4")}>
+    <div className={cn("vc-stagger grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4")}>
       {kpis.map((k) => (
         <KpiCard key={k.label} kpi={k} />
       ))}

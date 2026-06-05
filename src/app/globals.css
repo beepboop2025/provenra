@@ -31,8 +31,15 @@
 
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Fira Code as the display/instrument face (ui-ux-pro-max: data/technical mood). */
+  --font-display: var(--font-geist-mono), ui-monospace, monospace;
 
   --radius-card: 14px;
+
+  /* Depth tokens — layered shadows give the dark surfaces real elevation. */
+  --shadow-panel: 0 1px 0 0 #ffffff08 inset, 0 8px 24px -12px #00000080;
+  --shadow-lift: 0 1px 0 0 #ffffff10 inset, 0 18px 40px -16px #000000cc;
+  --glow-brand: 0 0 24px -6px #2dd4bf66;
 }
 
 html {
@@ -42,11 +49,51 @@ html {
 
 body {
   background:
-    radial-gradient(1200px 600px at 80% -10%, #0e2a3340 0%, transparent 60%),
-    radial-gradient(1000px 500px at -10% 10%, #1a213d40 0%, transparent 55%),
+    radial-gradient(1100px 560px at 82% -12%, #0e2a3355 0%, transparent 58%),
+    radial-gradient(900px 520px at -8% 6%, #1a213d4d 0%, transparent 55%),
+    radial-gradient(700px 700px at 50% 120%, #11203a40 0%, transparent 60%),
     var(--color-bg);
+  background-attachment: fixed;
   color: var(--color-fg);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fine film-grain overlay — adds tactile depth so dark surfaces don't read flat.
+   Fixed + pointer-events:none so it never interferes with interaction. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Display/instrument typography for page titles and the wordmark. */
+h1,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+/* Monospaced figures everywhere data appears — terminal-grade column alignment. */
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessibility (ui-ux-pro-max CRITICAL): always-visible keyboard focus rings. */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: #04201c;
 }
 
 /* Thin, on-brand scrollbars for the data-dense panels. */
@@ -103,4 +150,60 @@ body {
 .vc-flow {
   stroke-dasharray: 6 8;
   animation: vc-dash 30s linear infinite;
+}
+
+/* Orchestrated page-load: stagger direct children's entrance for a "boot-up"
+   reveal (the one high-impact moment the design skill recommends). */
+.vc-stagger > * {
+  opacity: 0;
+  animation: vc-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.vc-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.vc-stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.vc-stagger > *:nth-child(3) { animation-delay: 0.10s; }
+.vc-stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.vc-stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.vc-stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.vc-stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.vc-stagger > *:nth-child(8) { animation-delay: 0.30s; }
+
+/* Elevated panel: real depth + a calm, layout-stable hover (no scale shift). */
+.vc-card {
+  box-shadow: var(--shadow-panel);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.vc-card:hover {
+  border-color: #2a3a55;
+  box-shadow: var(--shadow-lift);
+}
+/* Interactive panels (clickable) get a subtle lift + brand-tinted edge. */
+.vc-card-interactive {
+  cursor: pointer;
+}
+.vc-card-interactive:hover {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-lift), var(--glow-brand);
+  transform: translateY(-2px);
+}
+
+/* Sheen sweep for progress/score bars — quiet sign of "live" data. */
+@keyframes vc-sheen {
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/* Respect reduced-motion: kill all non-essential animation (a11y requirement). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .vc-stagger > * {
+    opacity: 1;
+  }
 }
