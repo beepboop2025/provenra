@@ -13,6 +13,7 @@ import {
   FlaskConical,
   Warehouse,
   ClipboardCheck,
+  Clapperboard,
   Bell,
   Globe,
   Menu,
@@ -33,6 +34,7 @@ const NAV = [
   { href: "/inventory", label: "Shortage & Inventory", icon: PackageSearch, module: "inventory" },
   { href: "/compliance", label: "Recall & Compliance", icon: ShieldCheck, module: "compliance" },
   { href: "/verify", label: "Verify a Unit", icon: Activity, module: null },
+  { href: "/intro", label: "Intro", icon: Clapperboard, module: null },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {

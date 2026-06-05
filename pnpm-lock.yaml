@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@remotion/player':
+        specifier: ^4.0.472
+        version: 4.0.472(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -32,6 +35,9 @@ importers:
       recharts:
         specifier: ^3.8.1
         version: 3.8.1(@types/react@19.2.16)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1)
+      remotion:
+        specifier: ^4.0.472
+        version: 4.0.472(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
@@ -463,6 +469,12 @@ packages:
         optional: true
       react-redux:
         optional: true
+
+  '@remotion/player@4.0.472':
+    resolution: {integrity: sha512-YVQDIKzIpLLgHoufoTn9FogLfwrOOvm2UWvFHVLVKNtXp6LFjWaRPoa7vv/a4kZdqyv14Y0r2/1N93CpzoHEZQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -1884,6 +1896,12 @@ packages:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
 
+  remotion@4.0.472:
+    resolution: {integrity: sha512-HxzK5lakpZZyb5Gc+0awg9GLPLsRJo+5uomHknZFbfBWHsFRmdGvEYCiYlvwVZpg/iJNgU1wbSZLuyjCJGxg5A==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   reselect@5.1.1:
     resolution: {integrity: sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==}
 
@@ -2544,6 +2562,12 @@ snapshots:
     optionalDependencies:
       react: 19.2.4
       react-redux: 9.3.0(@types/react@19.2.16)(react@19.2.4)(redux@5.0.1)
+
+  '@remotion/player@4.0.472(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      remotion: 4.0.472(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
 
   '@rtsao/scc@1.1.0': {}
 
@@ -4065,6 +4089,11 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       set-function-name: 2.0.2
+
+  remotion@4.0.472(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   reselect@5.1.1: {}
 
