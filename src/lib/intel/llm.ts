@@ -62,6 +62,10 @@ async function viaGemini(req: LlmRequest, model: string): Promise<{ text: string
     contents: [{ role: "user", parts }],
     generationConfig: {
       maxOutputTokens: req.maxTokens ?? 2048,
+      // gemini-flash-latest is a thinking model — thinking consumes the output
+      // budget and truncates the answer. We don't need it for extraction/summary,
+      // so disable it and give the full budget to the response.
+      thinkingConfig: { thinkingBudget: 0 },
       ...(req.json ? { responseMimeType: "application/json" } : {}),
     },
   };
