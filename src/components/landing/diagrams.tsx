@@ -5,20 +5,21 @@
  */
 import * as React from "react";
 
-// Light, clinical palette — these diagrams render on the light /intro landing.
+// Dark palette — matches the app's design tokens (the /intro landing now uses
+// the same dark theme as the rest of the site).
 const C = {
-  surface: "#ffffff",
-  surface2: "#eef3f8",
-  border: "#cbd5e1",
-  fg: "#0f172a",
-  muted: "#475569",
-  faint: "#94a3b8",
-  brand: "#0d9488",
-  violet: "#7c3aed",
-  ok: "#059669",
-  warn: "#d97706",
-  danger: "#dc2626",
-  info: "#2563eb",
+  surface: "#0f1626",
+  surface2: "#151e30",
+  border: "#26334d",
+  fg: "#e6edf6",
+  muted: "#8a99b0",
+  faint: "#5a6a82",
+  brand: "#2dd4bf",
+  violet: "#a78bfa",
+  ok: "#34d399",
+  warn: "#fbbf24",
+  danger: "#f87171",
+  info: "#60a5fa",
 };
 
 type Props = { className?: string };
