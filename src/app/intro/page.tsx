@@ -10,6 +10,9 @@ import {
   Warehouse,
   FileWarning,
   BadgeCheck,
+  Building2,
+  Truck,
+  Check,
 } from "lucide-react";
 import { Badge, Card } from "@/components/ui/primitives";
 import { PromoPlayer } from "@/components/promo/promo-player";
@@ -17,9 +20,43 @@ import { PromoPlayer } from "@/components/promo/promo-player";
 export const metadata: Metadata = {
   title: "VitalChain — Catch the bad batch before it reaches a patient",
   description:
-    "VitalChain unifies GS1 track & trace, cold-chain monitoring, NSQ quality surveillance, QMS, warehouse and recall into one pharma supply-chain command center. Built India-first, ready for global markets.",
+    "Pharma supply-chain command center for hospital chains and distributors. Catch recalled and substandard (NSQ) batches before they reach a patient, prove cold-chain integrity, enforce FEFO, and reconcile recalls across states. Built India-first.",
   alternates: { canonical: "/intro" },
 };
+
+// Buyer-segmented value props. Hospital chains and distributors receive and move
+// drugs (they don't manufacture), so the copy speaks to their jobs: patient
+// safety and verification for hospitals; margin, FEFO and GDP for distributors.
+const AUDIENCES = [
+  {
+    icon: Building2,
+    tag: "For hospital chains",
+    headline: "Stop a recalled batch before it reaches a ward.",
+    points: [
+      "Scan a pack at receiving or the bedside to confirm it is genuine and not under recall.",
+      "Match every CDSCO NSQ alert against the stock your pharmacy and wards already hold.",
+      "Catch a silent freeze before insulin or a vaccine reaches a patient.",
+      "Dispense oldest-expiry first and cut expiry write-offs across every site.",
+      "Keep essential medicines on the shelf before a shortage reaches patient care.",
+    ],
+    href: "/verify",
+    cta: "See point-of-dispense verify",
+  },
+  {
+    icon: Truck,
+    tag: "For distributors & C&F agents",
+    headline: "Protect your margin from expiry and recalls.",
+    points: [
+      "Enforce FEFO on every pick so near-expiry stock ships before you write it off.",
+      "Prove cold-chain integrity in transit with mean kinetic temperature, not a single max reading.",
+      "Reconcile a recall across every state and downstream customer you supplied.",
+      "Forecast demand and flag the single-source SKUs that turn into stockouts.",
+      "Carry GS1 serialization for exports and top brands without a second system.",
+    ],
+    href: "/warehouse",
+    cta: "See the warehouse (WMS)",
+  },
+];
 
 // Voice-of-customer FAQ — also emitted as FAQPage schema so AI answer engines
 // (ChatGPT, Perplexity, Google AI Overviews) can extract and cite it.
@@ -27,6 +64,14 @@ const FAQS = [
   {
     q: "What does VitalChain do?",
     a: "VitalChain runs a pharmaceutical supply chain from one screen. It tracks serialized packs, watches cold-chain temperature, matches quality-failure alerts to stock you hold, manages deviations and recalls, and predicts shortages.",
+  },
+  {
+    q: "Who is VitalChain for?",
+    a: "Hospital chains and pharmaceutical distributors. Hospitals use it to verify packs, catch recalled or NSQ batches in ward and pharmacy stock, and protect cold-chain medicines. Distributors and C&F agents use it to enforce FEFO, prove cold-chain integrity in transit, and reconcile recalls across states.",
+  },
+  {
+    q: "Does it replace our ERP or hospital pharmacy system?",
+    a: "No. VitalChain sits on top of the systems you run and adds the supply-chain intelligence they lack: NSQ matching, mean-kinetic-temperature cold-chain judgment, FEFO enforcement, and cross-state recall reconciliation. The data layer is built to read from your existing inventory behind one interface.",
   },
   {
     q: "Is it built for Indian pharma regulations?",
@@ -109,8 +154,9 @@ export default function IntroPage() {
           <span className="text-[var(--color-brand)]">before it reaches a patient.</span>
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--color-muted)]">
-          VitalChain pulls track &amp; trace, cold chain, quality, inventory and recalls into one
-          command center. Built for India&apos;s pharma supply chain, ready for global markets.
+          Run hospital pharmacies or a distribution network? VitalChain unifies track &amp; trace,
+          cold chain, quality and recalls into one command center, so a bad batch never reaches a
+          patient. Built India-first.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
           <Link
@@ -157,6 +203,48 @@ export default function IntroPage() {
                 </div>
                 <h3 className="mt-3 font-display text-base font-semibold">{p.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{p.body}</p>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Audiences */}
+      <section>
+        <h2 className="font-display text-2xl font-bold tracking-tight">Built for your side of the chain.</h2>
+        <p className="mt-2 text-sm text-[var(--color-muted)]">
+          You receive and move medicine. VitalChain is shaped around that, not around the factory.
+        </p>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {AUDIENCES.map((a) => {
+            const Icon = a.icon;
+            return (
+              <Card key={a.tag} className="flex flex-col p-6">
+                <div className="flex items-center gap-2.5">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-[var(--color-brand)]/12 text-[var(--color-brand)]">
+                    <Icon size={20} />
+                  </div>
+                  <span className="font-display text-xs font-semibold uppercase tracking-widest text-[var(--color-faint)]">
+                    {a.tag}
+                  </span>
+                </div>
+                <h3 className="mt-4 font-display text-xl font-bold leading-snug tracking-tight">
+                  {a.headline}
+                </h3>
+                <ul className="mt-4 flex flex-1 flex-col gap-2.5">
+                  {a.points.map((pt) => (
+                    <li key={pt} className="flex gap-2.5 text-sm leading-relaxed text-[var(--color-muted)]">
+                      <Check size={16} className="mt-0.5 shrink-0 text-[var(--color-brand)]" />
+                      <span>{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={a.href}
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-brand)] hover:underline"
+                >
+                  {a.cta} <ArrowRight size={15} />
+                </Link>
               </Card>
             );
           })}
