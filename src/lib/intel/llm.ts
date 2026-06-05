@@ -20,7 +20,7 @@ export type LlmInfo = {
 
 export function llmInfo(): LlmInfo {
   if (process.env.GEMINI_API_KEY) {
-    return { enabled: true, provider: "gemini", model: process.env.GEMINI_MODEL || "gemini-2.0-flash" };
+    return { enabled: true, provider: "gemini", model: process.env.GEMINI_MODEL || "gemini-flash-latest" };
   }
   if (process.env.ANTHROPIC_API_KEY) {
     return { enabled: true, provider: "claude", model: "claude-opus-4-8" };
@@ -49,7 +49,9 @@ export async function llmText(req: LlmRequest): Promise<{ text: string; model: s
 
 async function viaGemini(req: LlmRequest, model: string): Promise<{ text: string; model: string } | null> {
   const key = process.env.GEMINI_API_KEY!;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+  // Header auth (X-goog-api-key) — works across key types and newer models;
+  // the ?key= query param fails for some key kinds.
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
   const parts: Array<Record<string, unknown>> = [];
   if (req.pdfBase64) parts.push({ inline_data: { mime_type: "application/pdf", data: req.pdfBase64 } });
@@ -69,7 +71,7 @@ async function viaGemini(req: LlmRequest, model: string): Promise<{ text: string
   const res = await fetch(url, {
     method: "POST",
     signal: ctrl.signal,
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", "x-goog-api-key": key },
     body: JSON.stringify(body),
   });
   clearTimeout(t);
