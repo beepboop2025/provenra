@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Badge, Card } from "@/components/ui/primitives";
 import { PromoPlayer } from "@/components/promo/promo-player";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "VitalChain — Catch the bad batch before it reaches a patient",
@@ -95,6 +96,18 @@ const FAQS = [
   },
 ];
 
+// ─── PROOF METRICS — FILL THESE IN ──────────────────────────────────────────
+// Replace each `value` with a real, verifiable figure once you have pilot/
+// customer data (the copywriting skill: never fabricate stats). Keep `value` as
+// "—" until then. Edit the strings below; the strip restyles automatically.
+//   e.g. { value: "31%", label: "fewer expiry write-offs", note: "Distributor pilot, FY26" }
+const METRICS = [
+  { value: "—", label: "NSQ batches caught in held stock", note: "" },
+  { value: "—", label: "cold-chain excursions flagged", note: "" },
+  { value: "—", label: "reduction in expiry write-offs", note: "" },
+  { value: "—", label: "faster recall reconciliation", note: "" },
+];
+
 const PROBLEMS = [
   {
     icon: FileWarning,
@@ -171,6 +184,31 @@ export default function IntroPage() {
           >
             See the NSQ watch
           </Link>
+        </div>
+      </section>
+
+      {/* Proof metrics strip (fill in METRICS above) */}
+      <section className="-mt-6">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-border)] md:grid-cols-4">
+          {METRICS.map((m) => {
+            const placeholder = m.value === "—" || m.value.trim() === "";
+            return (
+              <div key={m.label} className="bg-[var(--color-surface)] px-4 py-6 text-center">
+                <div
+                  className={cn(
+                    "font-display text-3xl font-extrabold tabular-nums tracking-tight lg:text-4xl",
+                    placeholder ? "text-[var(--color-faint)]" : "text-[var(--color-brand)]"
+                  )}
+                >
+                  {placeholder ? "—" : m.value}
+                </div>
+                <div className="mt-1.5 text-xs leading-snug text-[var(--color-muted)]">{m.label}</div>
+                {m.note ? (
+                  <div className="mt-0.5 text-[10px] text-[var(--color-faint)]">{m.note}</div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </section>
 
