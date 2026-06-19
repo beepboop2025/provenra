@@ -6,7 +6,7 @@ DAVA-iVEDA serialization, Schedule M, NLEM, WHO-GDP) with **international market
 
 Built with **Next.js 16 + TypeScript (strict) + Tailwind v4 + Recharts**.
 
-## The four modules
+## The seven modules
 
 | Route | Module | What it does |
 |-------|--------|--------------|
