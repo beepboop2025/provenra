@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { fefoPickRate, pickFillRate } from "@/lib/analytics";
@@ -52,7 +52,7 @@ export default function WarehousePage() {
   );
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="FEFO execution"
       title="Warehouse Management"
       subtitle="FEFO-enforced picking, zoned putaway and dispatch — the physical execution layer"
@@ -220,6 +220,6 @@ export default function WarehousePage() {
           </ul>
         </Card>
       </div>
-    </TexturaShell>
+    </CommandShell>
   );
 }

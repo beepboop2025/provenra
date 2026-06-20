@@ -26,7 +26,7 @@ const inIndia = (f: Facility) =>
   f.location.lat >= BOUNDS.latMin &&
   f.location.lat <= BOUNDS.latMax;
 
-// Textura palette: icy routes, refined amber/coral severity, peach hubs.
+// Editorial palette: icy routes, refined amber/coral severity, peach hubs.
 const statusColor: Record<Shipment["status"], string> = {
   in_transit: "#a1ecff",
   delivered: "#7fe0c2",

@@ -7,7 +7,7 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 
 /**
- * Textura's hallmark 3D: a liquid, Perlin-noise-displaced blob (drei's
+ * The hallmark 3D: a liquid, Perlin-noise-displaced blob (drei's
  * MeshDistortMaterial over a high-detail icosphere) glowing under bloom, in the
  * icy/peach accent. The camera dollies back as you scroll (their tunnel-style
  * scroll-driven move), and the blob parallaxes to the pointer.

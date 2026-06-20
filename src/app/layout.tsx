@@ -21,10 +21,10 @@ const firaCode = Fira_Code({
   weight: ["400", "500", "600", "700"],
 });
 
-// Textura's actual type pairing (per the discovery doc §6.2): Gilda Display — a
+// The editorial type pairing: Gilda Display — a
 // high-contrast Didone serif — as the display face, and Lato as the body face.
-// Loaded as CSS variables; the Textura surfaces (the /intro landing and the
-// Command Center, both `.tx-stage`) opt into them, so the data-dense dashboard
+// Loaded as CSS variables; the Editorial surfaces (the /intro landing and the
+// Command Center, both `.ed-stage`) opt into them, so the data-dense dashboard
 // pages keep their Fira instrument typography.
 const gildaDisplay = Gilda_Display({
   variable: "--font-gilda",

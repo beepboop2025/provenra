@@ -9,7 +9,7 @@ import {
   AlertOctagon,
   Link2,
 } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { qmsHealthScore } from "@/lib/analytics";
@@ -74,7 +74,7 @@ export default function QmsPage() {
     data.capas.filter((c) => (col === "open" ? c.status === "open" || c.status === "overdue" : c.status === col));
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="Deviations · CAPA · Audit"
       title="Quality Management System"
       subtitle="Deviations, CAPA lifecycle, batch release records and a tamper-evident audit trail"
@@ -298,6 +298,6 @@ export default function QmsPage() {
           </ul>
         </Card>
       </div>
-    </TexturaShell>
+    </CommandShell>
   );
 }

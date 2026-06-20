@@ -1,7 +1,7 @@
 "use client";
 
 import { FlaskConical, AlertOctagon, Beaker, ShieldX, Info } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
 import { DonutChart } from "@/components/charts/charts";
 import { getData } from "@/lib/data/engine";
@@ -63,7 +63,7 @@ export default function QualityPage() {
     .filter((d) => d.value > 0);
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="CDSCO · NSQ surveillance"
       title="Quality & NSQ Watch"
       subtitle="CDSCO drug-alert surveillance, batch quality failures & excipient integrity"
@@ -231,6 +231,6 @@ export default function QualityPage() {
           </div>
         )}
       </Card>
-    </TexturaShell>
+    </CommandShell>
   );
 }

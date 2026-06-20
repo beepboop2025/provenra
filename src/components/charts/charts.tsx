@@ -20,7 +20,7 @@ import {
 import { format } from "date-fns";
 import type { DemandPoint, SensorReading, TempRange } from "@/lib/types";
 
-// Textura chart palette — icy + peach accents, hairline-white structure, ink
+// Editorial chart palette — icy + peach accents, hairline-white structure, ink
 // tooltips. (SVG presentation attributes can't read CSS vars, so these are the
 // resolved hex equivalents of the theme tokens.)
 const ICY = "#a1ecff";

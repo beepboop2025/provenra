@@ -8,8 +8,8 @@
  */
 
 @theme {
-  /* Textura palette — the whole app is now the immersive Textura surface, so
-     the design tokens themselves are the Textura world: pure-black ink, hairline
+  /* Editorial palette — the whole app is now the immersive Editorial surface, so
+     the design tokens themselves are the Editorial world: pure-black ink, hairline
      white borders, the icy-blue + peach accents, and a refined, desaturated
      severity set that sits elegantly on black instead of bright dashboard RGB. */
   --color-bg: #000000;
@@ -40,19 +40,19 @@
 
   --radius-card: 14px;
 
-  /* ── Textura-edition landing tokens ──────────────────────────────────────
-     A near-black neutral canvas with a single warm "blush" accent (Textura's
+  /* ── Editorial-edition landing tokens ──────────────────────────────────────
+     A near-black neutral canvas with a single warm "blush" accent (Editorial's
      signature) sitting alongside the existing clinical teal brand. Used only
      by the full-bleed marketing landing, never the dashboard. */
   --color-ink: #000000;
   --color-ink-2: #050505;
-  /* Textura text ramp: near-white headings, grey body. */
+  /* Editorial text ramp: near-white headings, grey body. */
   --color-warm: #c7c7c7;
   --color-warm-strong: #fafafa;
   --color-warm-dim: #8a8a8a;
-  /* Textura accent: icy blue + peach, combined as the signature gradient. */
-  --color-tx-accent: #a1ecff;
-  --color-tx-peach: #ffab98;
+  /* Editorial accent: icy blue + peach, combined as the signature gradient. */
+  --color-ed-accent: #a1ecff;
+  --color-ed-peach: #ffab98;
 
   /* Depth tokens — layered shadows give the dark surfaces real elevation. */
   --shadow-panel: 0 1px 0 0 #ffffff08 inset, 0 8px 24px -12px #00000080;
@@ -246,14 +246,14 @@ html.lenis body {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   TEXTURA EDITION — full-bleed marketing landing (route: /intro)
+   EDITORIAL EDITION — full-bleed marketing landing (route: /intro)
    A separate visual language layered on top of the dashboard system: a
    near-black canvas, oversized display type, split-text reveals, a WebGL
-   hero. All class-namespaced `tx-` so the dashboard is untouched.
+   hero. All class-namespaced `ed-` so the dashboard is untouched.
    ════════════════════════════════════════════════════════════════════════ */
 
 /* Full-bleed near-black stage. Sits behind the WebGL canvas. */
-.tx-stage {
+.ed-stage {
   background:
     radial-gradient(900px 600px at 78% -10%, #a1ecff16 0%, transparent 60%),
     radial-gradient(760px 520px at 12% 110%, #ffab9810 0%, transparent 58%),
@@ -261,32 +261,32 @@ html.lenis body {
   color: var(--color-warm-strong);
 }
 
-/* Textura signature accent gradient — reused for CTAs and accent text. */
-.tx-grad {
+/* Editorial signature accent gradient — reused for CTAs and accent text. */
+.ed-grad {
   background: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
 }
-.tx-grad-text {
+.ed-grad-text {
   background: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* Fluid display type — the Textura-scale wordmark. clamp() keeps the giant
-   headline from clipping on mobile (a bug the real Textura site shipped). */
-.tx-display {
+/* Fluid display type — the editorial-scale wordmark. clamp() keeps the giant
+   headline from clipping on mobile. */
+.ed-display {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: 0.92;
   letter-spacing: -0.03em;
 }
-.tx-hero-mark {
+.ed-hero-mark {
   font-size: clamp(3.2rem, 13vw, 13rem);
 }
-.tx-h2 {
+.ed-h2 {
   font-size: clamp(2rem, 6vw, 5rem);
 }
-.tx-eyebrow {
+.ed-eyebrow {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.32em;
@@ -295,134 +295,134 @@ html.lenis body {
 
 /* ── Split-text reveal ──────────────────────────────────────────────────
    Each word renders server-side inside a clip mask; the inner span starts
-   translated down. Adding `.tx-in` (via IntersectionObserver) slides it up.
-   Deterministic markup → no hydration mismatch (Textura's #418 bug). */
-.tx-split-word {
+   translated down. Adding `.ed-in` (via IntersectionObserver) slides it up.
+   Deterministic markup → no hydration mismatch. */
+.ed-split-word {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
   padding-bottom: 0.06em; /* room for descenders inside the clip mask */
 }
-.tx-split-inner {
+.ed-split-inner {
   display: inline-block;
   transform: translateY(110%);
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
-.tx-in .tx-split-inner {
+.ed-in .ed-split-inner {
   transform: translateY(0);
 }
 
-/* Warm "blush" pill CTA — Textura's primary button. */
-.tx-cta {
+/* Warm "blush" pill CTA — Editorial's primary button. */
+.ed-cta {
   background: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
   color: #04121a;
   transition: filter 0.25s ease, transform 0.25s ease;
 }
-.tx-cta:hover {
+.ed-cta:hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
 /* Hairline ghost button. */
-.tx-ghost {
+.ed-ghost {
   border: 1px solid #ffffff24;
   color: var(--color-warm-strong);
   transition: border-color 0.25s ease, background-color 0.25s ease;
 }
-.tx-ghost:hover {
+.ed-ghost:hover {
   border-color: #ffffff55;
   background: #ffffff0a;
 }
 
 /* Oversized scrolling marquee band (services / clients). */
-@keyframes tx-marquee {
+@keyframes ed-marquee {
   to {
     transform: translateX(-50%);
   }
 }
-.tx-marquee {
+.ed-marquee {
   display: inline-flex;
   white-space: nowrap;
-  animation: tx-marquee 28s linear infinite;
+  animation: ed-marquee 28s linear infinite;
 }
-.tx-marquee-row:hover .tx-marquee {
+.ed-marquee-row:hover .ed-marquee {
   animation-play-state: paused;
 }
 
 /* Slow vertical drift for the scroll cue. */
-@keyframes tx-bob {
+@keyframes ed-bob {
   0%, 100% { transform: translateY(0); opacity: 0.6; }
   50% { transform: translateY(6px); opacity: 1; }
 }
-.tx-bob {
-  animation: tx-bob 2.2s ease-in-out infinite;
+.ed-bob {
+  animation: ed-bob 2.2s ease-in-out infinite;
 }
 
 /* Featured-module tile: media zooms gently on hover, label slides up. */
-.tx-tile video,
-.tx-tile img {
+.ed-tile video,
+.ed-tile img {
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.tx-tile:hover video,
-.tx-tile:hover img {
+.ed-tile:hover video,
+.ed-tile:hover img {
   transform: scale(1.05);
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   COMMAND CENTER — TEXTURA EDITION
-   A faithful port of textura.agency's design system (per the discovery doc):
+   COMMAND CENTER — EDITORIAL EDITION
+   The editorial design system, applied to the data dashboard:
    Gilda Display + Lato, the exact coral→icy accent gradient, a fluid-rem grid
    that scales the whole UI as one, and the assets-loader fade-in. Everything
    is `cc-`/scope-namespaced so the data dashboard and the /intro landing are
    untouched.
    ════════════════════════════════════════════════════════════════════════ */
 
-/* Both Textura surfaces — the /intro landing and the Command Center — opt into
-   Textura's real type pairing. Because `.tx-*` classes read `--font-display`,
-   redefining the var on `.tx-stage` re-faces every heading to Gilda without
+/* Both Editorial surfaces — the /intro landing and the Command Center — opt into
+   the editorial type pairing. Because `.ed-*` classes read `--font-display`,
+   redefining the var on `.ed-stage` re-faces every heading to Gilda without
    touching the global dashboard tokens. The Command Center carries both
-   `.cc-stage` and `.tx-stage`, so this covers it too. */
-.tx-stage {
+   `.cc-stage` and `.ed-stage`, so this covers it too. */
+.ed-stage {
   --font-display: var(--font-gilda), Georgia, "Times New Roman", serif;
   --font-body: var(--font-lato), system-ui, sans-serif;
   --accent-grad: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
   font-family: var(--font-body);
   font-weight: 300;
 }
-/* Headings inside a Textura surface use Gilda (the shared CardHeader/PageHeader
+/* Headings inside a Editorial surface use Gilda (the shared CardHeader/PageHeader
    render plain h2/h3 that would otherwise stay sans). */
-.tx-stage h2,
-.tx-stage h3 {
+.ed-stage h2,
+.ed-stage h3 {
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.01em;
 }
 /* Card hover edge picks up the icy accent rather than the old teal-grey. */
-.tx-stage .vc-card:hover {
+.ed-stage .vc-card:hover {
   border-color: #a1ecff55;
 }
 /* Gilda ships a single 400 weight — never let a bold utility synthesize it. */
-.tx-stage .tx-display {
+.ed-stage .ed-display {
   font-family: var(--font-display);
   font-weight: 400;
   letter-spacing: -0.005em;
   line-height: 0.96;
 }
 /* Eyebrows stay sans (Lato) for legible small-caps tracking against the serif. */
-.tx-stage .tx-eyebrow {
+.ed-stage .ed-eyebrow {
   font-family: var(--font-body);
   font-weight: 700;
   letter-spacing: 0.28em;
 }
 
-/* Hero wordmark at Textura's viewport scale (§6.2: ~11vw, 18vw on mobile). */
+/* Hero wordmark at the editorial viewport scale (~11vw, 18vw on mobile). */
 .cc-hero-mark {
   font-size: clamp(2.6rem, 11vw, 12rem);
   line-height: 0.92;
 }
 @media (max-width: 576px) {
-  /* 13vw (not Textura's 18vw) so the 10-char VITALCHAIN wordmark fits without
+  /* 13vw (not 18vw) so the 10-char VITALCHAIN wordmark fits without
      clipping on a phone — the giant single line must never overflow. */
   .cc-hero-mark {
     font-size: 12vw;
@@ -430,7 +430,7 @@ html.lenis body {
   }
 }
 
-/* Square brand glyph that precedes the wordmark (Textura's "▢"). */
+/* Square brand glyph that precedes the wordmark (the "▢" glyph). */
 .cc-mark-box {
   display: inline-block;
   border: 0.08em solid currentColor;
@@ -455,7 +455,7 @@ html.lenis body {
   backdrop-filter: blur(6px);
 }
 
-/* Gradient pill CTA + underlined ghost link (Textura's two hero actions). */
+/* Gradient pill CTA + underlined ghost link (Editorial's two hero actions). */
 .cc-cta {
   background: var(--accent-grad);
   color: #04121a;
@@ -484,7 +484,7 @@ html.lenis body {
   transform: translateY(-2px);
 }
 
-/* Horizontal scroll-snap rail (Textura uses Swiper; this is the same UX, dep-free). */
+/* Horizontal scroll-snap rail (a horizontal scroll-snap rail — same UX as a carousel, dependency-free). */
 .cc-rail {
   display: flex;
   gap: 1.25rem;
@@ -508,7 +508,7 @@ html.lenis body {
   backdrop-filter: blur(8px);
 }
 
-/* Full-screen index menu: fades + lifts its big tx-display links in. */
+/* Full-screen index menu: fades + lifts its big ed-display links in. */
 .cc-menu {
   background:
     radial-gradient(900px 600px at 78% -10%, #a1ecff14 0%, transparent 60%),
@@ -524,7 +524,7 @@ html.lenis body {
   animation: cc-menu-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ── Fluid-rem grid (Textura §6.3) ───────────────────────────────────────
+/* ── Fluid-rem grid ───────────────────────────────────────
    The whole UI scales as one: root font-size is pinned to a fraction of the
    viewport width so every rem-based size zooms together. Scoped to `html`
    only while the Command Center is mounted (the route component toggles
@@ -539,15 +539,15 @@ html.cc-fluid {
 @media (max-width: 576px)  { html.cc-fluid { font-size: 4.102564vw; } }
 
 /* ── Smoothness & interactivity ──────────────────────────────────────────
-   Buttery hover/focus feedback everywhere inside a Textura surface, so the
+   Buttery hover/focus feedback everywhere inside a Editorial surface, so the
    whole page feels alive rather than static. */
-.tx-stage a,
-.tx-stage button,
-.tx-stage select,
-.tx-stage input,
-.tx-stage [role="button"],
-.tx-stage .vc-card,
-.tx-stage tr {
+.ed-stage a,
+.ed-stage button,
+.ed-stage select,
+.ed-stage input,
+.ed-stage [role="button"],
+.ed-stage .vc-card,
+.ed-stage tr {
   transition:
     color 0.22s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
     background-color 0.22s ease,
@@ -557,19 +557,19 @@ html.cc-fluid {
     transform 0.25s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
 }
 /* Data tables: rows lift their tint smoothly and reveal an icy edge on hover. */
-.tx-stage tbody tr:hover {
+.ed-stage tbody tr:hover {
   background: #ffffff06;
 }
-.tx-stage tbody tr {
+.ed-stage tbody tr {
   box-shadow: inset 2px 0 0 0 transparent;
 }
-.tx-stage tbody tr:hover {
+.ed-stage tbody tr:hover {
   box-shadow: inset 2px 0 0 0 #a1ecff66;
 }
 /* Inputs/selects glow icy on focus. */
-.tx-stage input:focus,
-.tx-stage select:focus,
-.tx-stage textarea:focus {
+.ed-stage input:focus,
+.ed-stage select:focus,
+.ed-stage textarea:focus {
   border-color: #a1ecff66;
   box-shadow: 0 0 0 3px #a1ecff1f;
   outline: none;
@@ -593,7 +593,7 @@ html.cc-fluid {
     transform: none !important;
   }
   /* Split-text must never hide content when motion is off. */
-  .tx-split-inner {
+  .ed-split-inner {
     transform: none !important;
   }
   .cc-menu-item {

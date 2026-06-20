@@ -9,7 +9,7 @@ import {
   ScanLine,
   ArrowRight,
 } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { riskBand } from "@/lib/risk";
@@ -40,7 +40,7 @@ export default function VerifyPage() {
   }
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="Point of dispense"
       title="Verify a Unit"
       subtitle="Point-of-dispense authentication — scan or enter a unit serial number"
@@ -115,7 +115,7 @@ export default function VerifyPage() {
           />
         </div>
       </Card>
-    </TexturaShell>
+    </CommandShell>
   );
 }
 

@@ -4,7 +4,7 @@ import { createElement, useEffect, useRef, useState, type ElementType } from "re
 import { animated, useSpring } from "@react-spring/web";
 
 /**
- * Scroll-reveal wrapper, spring-physics edition (matches Textura's react-spring
+ * Scroll-reveal wrapper, spring-physics edition (built on react-spring
  * approach rather than CSS transitions). Springs from translated+transparent to
  * resting when the element scrolls into view (once). `delay` staggers siblings;
  * reduced-motion makes it immediate.

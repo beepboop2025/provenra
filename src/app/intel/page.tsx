@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Radar, ShieldAlert, PackageX, Bot, Sparkles } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader } from "@/components/ui/primitives";
 import { collectIntel } from "@/lib/intel/collector";
 import { generateBriefing } from "@/lib/intel/agent";
@@ -27,7 +27,7 @@ export default async function IntelPage() {
   const critical = items.filter((i) => i.severity === "critical").length;
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="Cloud AI agents"
       title="Global Pharma Intelligence"
       subtitle="Cloud AI agents gather, consolidate and structure worldwide pharma signals — no laptop required"
@@ -159,6 +159,6 @@ export default async function IntelPage() {
         real public regulatory records and may lag the source. CDSCO rows are auto-extracted from the monthly PDF when
         an LLM key (free Gemini or Anthropic) is set; otherwise the latest alert is linked directly.
       </p>
-    </TexturaShell>
+    </CommandShell>
   );
 }

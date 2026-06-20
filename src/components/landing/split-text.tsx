@@ -5,7 +5,7 @@ import { animated, useTrail } from "@react-spring/web";
 import { cn } from "@/lib/utils";
 
 /**
- * Per-letter spring reveal — Textura's actual technique (physics springs, not
+ * Per-letter spring reveal — a physics-spring technique (real springs, not
  * CSS transitions), via @react-spring/web `useTrail` for the staggered cascade.
  *
  * Faithful to their spring-text-engine while keeping the bugs out:
@@ -75,7 +75,7 @@ export function SplitText({
     {
       ref,
       "aria-label": text,
-      className: cn("tx-split", shown && "tx-in", className),
+      className: cn("ed-split", shown && "ed-in", className),
     },
     words.map((word, wi) => {
       const letters = [...word].map((ch) => {
@@ -98,7 +98,7 @@ export function SplitText({
         <span
           key={wi}
           aria-hidden="true"
-          className={cn("tx-word", wordClassName?.(word, wi))}
+          className={cn("ed-word", wordClassName?.(word, wi))}
           style={{ display: "inline-block", whiteSpace: "nowrap" }}
         >
           {letters}

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PackageSearch, TrendingUp, CalendarClock, Boxes, Globe2 } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { DemandForecastChart } from "@/components/charts/charts";
 import { getData, demandSeries } from "@/lib/data/engine";
@@ -50,7 +50,7 @@ export default function InventoryPage() {
   const singleSourced = data.products.filter((p) => p.singleSource).length;
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="Forecast · Expiry · Resilience"
       title="Shortage & Inventory Risk"
       subtitle="Demand forecasting, stockout prediction and FEFO expiry control"
@@ -258,6 +258,6 @@ export default function InventoryPage() {
           </table>
         </div>
       </Card>
-    </TexturaShell>
+    </CommandShell>
   );
 }
