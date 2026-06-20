@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Fira_Sans, Fira_Code } from "next/font/google";
+import { Fira_Sans, Fira_Code, Gilda_Display, Lato } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { AppShell } from "@/components/layout/app-shell";
 
 // Fira pairing (ui-ux-pro-max recommendation for data/technical dashboards):
@@ -18,6 +19,23 @@ const firaCode = Fira_Code({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+});
+
+// Textura's actual type pairing (per the discovery doc §6.2): Gilda Display — a
+// high-contrast Didone serif — as the display face, and Lato as the body face.
+// Loaded as CSS variables; the Textura surfaces (the /intro landing and the
+// Command Center, both `.tx-stage`) opt into them, so the data-dense dashboard
+// pages keep their Fira instrument typography.
+const gildaDisplay = Gilda_Display({
+  variable: "--font-gilda",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+const lato = Lato({
+  variable: "--font-lato",
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "700"],
 });
 
 const SITE_URL = "https://vitalchain.vercel.app";
@@ -140,7 +158,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${firaSans.variable} ${firaCode.variable} h-full antialiased`}
+      className={`${firaSans.variable} ${firaCode.variable} ${gildaDisplay.variable} ${lato.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <script
@@ -149,6 +167,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <AppShell>{children}</AppShell>
+        <Analytics />
       </body>
     </html>
   );
