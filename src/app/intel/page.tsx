@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Radar, ShieldAlert, PackageX, Bot, Sparkles } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader } from "@/components/ui/primitives";
 import { collectIntel } from "@/lib/intel/collector";
 import { generateBriefing } from "@/lib/intel/agent";
@@ -27,16 +27,17 @@ export default async function IntelPage() {
   const critical = items.filter((i) => i.severity === "critical").length;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Global Pharma Intelligence"
-        subtitle="Cloud AI agents gather, consolidate and structure worldwide pharma signals — no laptop required"
-        icon={<Radar size={22} />}
-      >
+    <TexturaShell
+      eyebrow="Cloud AI agents"
+      title="Global Pharma Intelligence"
+      subtitle="Cloud AI agents gather, consolidate and structure worldwide pharma signals — no laptop required"
+      icon={<Radar size={22} />}
+      actions={
         <Badge tone={briefing.byAI ? "ok" : "warn"} pulse>
           {briefing.byAI ? "Analyst agent live" : "Collector only"}
         </Badge>
-      </PageHeader>
+      }
+    >
 
       {/* Agent pipeline status */}
       <div className="grid gap-3 lg:grid-cols-3">
@@ -158,6 +159,6 @@ export default async function IntelPage() {
         real public regulatory records and may lag the source. CDSCO rows are auto-extracted from the monthly PDF when
         an LLM key (free Gemini or Anthropic) is set; otherwise the latest alert is linked directly.
       </p>
-    </div>
+    </TexturaShell>
   );
 }

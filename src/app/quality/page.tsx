@@ -1,7 +1,7 @@
 "use client";
 
 import { FlaskConical, AlertOctagon, Beaker, ShieldX, Info } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
 import { DonutChart } from "@/components/charts/charts";
 import { getData } from "@/lib/data/engine";
@@ -32,10 +32,10 @@ const actionTone = {
 } as const;
 
 const defectColor: Record<QualityDefect, string> = {
-  nsq: "#fbbf24",
-  spurious: "#fb3b6b",
-  deg_eg: "#f87171",
-  nitrosamine: "#a78bfa",
+  nsq: "#f0c987",
+  spurious: "#ff7a63",
+  deg_eg: "#ff9d88",
+  nitrosamine: "#c6b4f5",
   adulterated: "#fb923c",
 };
 
@@ -63,16 +63,17 @@ export default function QualityPage() {
     .filter((d) => d.value > 0);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Quality & NSQ Watch"
-        subtitle="CDSCO drug-alert surveillance, batch quality failures & excipient integrity"
-        icon={<FlaskConical size={22} />}
-      >
+    <TexturaShell
+      eyebrow="CDSCO · NSQ surveillance"
+      title="Quality & NSQ Watch"
+      subtitle="CDSCO drug-alert surveillance, batch quality failures & excipient integrity"
+      icon={<FlaskConical size={22} />}
+      actions={
         <Badge tone="critical" pulse={degEg.length > 0}>
           {inInventory.length} alerts in inventory
         </Badge>
-      </PageHeader>
+      }
+    >
 
       {/* Research-grounded context banner */}
       <Card className="border-[var(--color-warn)]/30 bg-[var(--color-warn)]/5">
@@ -230,6 +231,6 @@ export default function QualityPage() {
           </div>
         )}
       </Card>
-    </div>
+    </TexturaShell>
   );
 }

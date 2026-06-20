@@ -1,7 +1,7 @@
 "use client";
 
 import { ShieldCheck, Recycle, Factory, FileCheck2, Info, ClipboardCheck } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { formatDate, formatNumber, formatPct, formatRelative } from "@/lib/format";
@@ -47,16 +47,17 @@ export default function CompliancePage() {
     : 0;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Recall & Compliance"
-        subtitle="Recall orchestration, supplier risk and multi-market regulatory posture"
-        icon={<ShieldCheck size={22} />}
-      >
+    <TexturaShell
+      eyebrow="Recalls · Schedule M · DSCSA"
+      title="Recall & Compliance"
+      subtitle="Recall orchestration, supplier risk and multi-market regulatory posture"
+      icon={<ShieldCheck size={22} />}
+      actions={
         <Badge tone={classI ? "critical" : "ok"} pulse={classI > 0}>
           {classI} Class I recall{classI === 1 ? "" : "s"}
         </Badge>
-      </PageHeader>
+      }
+    >
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
@@ -271,7 +272,7 @@ export default function CompliancePage() {
           </ul>
         </div>
       </Card>
-    </div>
+    </TexturaShell>
   );
 }
 

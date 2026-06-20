@@ -9,7 +9,7 @@ import {
   ScanLine,
   ArrowRight,
 } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { riskBand } from "@/lib/risk";
@@ -40,12 +40,12 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Verify a Unit"
-        subtitle="Point-of-dispense authentication — scan or enter a unit serial number"
-        icon={<Activity size={22} />}
-      />
+    <TexturaShell
+      eyebrow="Point of dispense"
+      title="Verify a Unit"
+      subtitle="Point-of-dispense authentication — scan or enter a unit serial number"
+      icon={<Activity size={22} />}
+    >
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
@@ -115,7 +115,7 @@ export default function VerifyPage() {
           />
         </div>
       </Card>
-    </div>
+    </TexturaShell>
   );
 }
 

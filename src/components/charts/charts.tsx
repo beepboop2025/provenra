@@ -20,19 +20,26 @@ import {
 import { format } from "date-fns";
 import type { DemandPoint, SensorReading, TempRange } from "@/lib/types";
 
+// Textura chart palette — icy + peach accents, hairline-white structure, ink
+// tooltips. (SVG presentation attributes can't read CSS vars, so these are the
+// resolved hex equivalents of the theme tokens.)
+const ICY = "#a1ecff";
+const PEACH = "#ffab98";
+const GRID = "#ffffff12";
+
 const axis = {
-  stroke: "#5a6a82",
+  stroke: "#ffffff66",
   fontSize: 11,
   tickLine: false,
   axisLine: false,
 };
 
 const tooltipStyle = {
-  background: "#0f1626",
-  border: "1px solid #1f2a3f",
-  borderRadius: 10,
+  background: "#0b0b0c",
+  border: "1px solid #ffffff1f",
+  borderRadius: 12,
   fontSize: 12,
-  color: "#e6edf6",
+  color: "#fafafa",
 };
 
 const fmtDay = (iso: string) => {
@@ -56,15 +63,15 @@ export function TempProfileChart({
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1f2a3f" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
         {/* Acceptable temperature band */}
         <ReferenceArea
           y1={range.min}
           y2={range.max}
-          fill="#34d399"
-          fillOpacity={0.08}
-          stroke="#34d399"
-          strokeOpacity={0.25}
+          fill={ICY}
+          fillOpacity={0.07}
+          stroke={ICY}
+          strokeOpacity={0.22}
           strokeDasharray="4 4"
         />
         <XAxis dataKey="t" tickFormatter={fmtHour} {...axis} minTickGap={40} />
@@ -85,10 +92,10 @@ export function TempProfileChart({
         <Line
           type="monotone"
           dataKey="temp"
-          stroke="#38bdf8"
+          stroke={ICY}
           strokeWidth={2}
           dot={false}
-          activeDot={{ r: 4 }}
+          activeDot={{ r: 4, fill: ICY }}
         />
       </LineChart>
     </ResponsiveContainer>
@@ -103,11 +110,11 @@ export function DemandForecastChart({ data }: { data: DemandPoint[] }) {
       <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
         <defs>
           <linearGradient id="bandFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.22} />
-            <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.02} />
+            <stop offset="0%" stopColor={PEACH} stopOpacity={0.2} />
+            <stop offset="100%" stopColor={PEACH} stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1f2a3f" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
         <XAxis dataKey="date" tickFormatter={fmtDay} {...axis} minTickGap={32} />
         <YAxis {...axis} width={44} />
         <Tooltip
@@ -126,13 +133,13 @@ export function DemandForecastChart({ data }: { data: DemandPoint[] }) {
           type="monotone"
           dataKey="lower"
           stroke="none"
-          fill="#0f1626"
+          fill="#000000"
           fillOpacity={1}
         />
         <Area
           type="monotone"
           dataKey="actual"
-          stroke="#2dd4bf"
+          stroke={ICY}
           strokeWidth={2}
           fill="none"
           connectNulls={false}
@@ -141,7 +148,7 @@ export function DemandForecastChart({ data }: { data: DemandPoint[] }) {
         <Area
           type="monotone"
           dataKey="forecast"
-          stroke="#a78bfa"
+          stroke={PEACH}
           strokeWidth={2}
           strokeDasharray="5 4"
           fill="none"
@@ -156,7 +163,7 @@ export function DemandForecastChart({ data }: { data: DemandPoint[] }) {
 
 export function MiniBarChart({
   data,
-  color = "#38bdf8",
+  color = ICY,
   height = 200,
 }: {
   data: { name: string; value: number }[];
@@ -170,7 +177,7 @@ export function MiniBarChart({
         layout="vertical"
         margin={{ top: 0, right: 12, left: 8, bottom: 0 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#1f2a3f" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={GRID} horizontal={false} />
         <XAxis type="number" {...axis} />
         <YAxis type="category" dataKey="name" {...axis} width={120} />
         <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#ffffff08" }} />

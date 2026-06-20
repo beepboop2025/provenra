@@ -10,7 +10,7 @@ import {
   MapPin,
   PackageCheck,
 } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
 import { DonutChart } from "@/components/charts/charts";
 import { getData, chainOfCustody } from "@/lib/data/engine";
@@ -71,11 +71,11 @@ export default function TracePage() {
     const m = new Map<SerialStatus, number>();
     for (const s of data.serials) m.set(s.status, (m.get(s.status) ?? 0) + 1);
     const colors: Record<string, string> = {
-      dispensed: "#34d399",
-      in_transit: "#38bdf8",
-      at_facility: "#2dd4bf",
-      recalled: "#fb3b6b",
-      suspect: "#f87171",
+      dispensed: "#7fe0c2",
+      in_transit: "#a1ecff",
+      at_facility: "#7fc8e8",
+      recalled: "#ff7a63",
+      suspect: "#ff9d88",
       commissioned: "#8a99b0",
       decommissioned: "#5a6a82",
     };
@@ -85,16 +85,17 @@ export default function TracePage() {
   const suspectCount = data.serials.filter((s) => s.status === "suspect" || s.riskScore >= 70).length;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Track & Trace"
-        subtitle="GS1 serialization, batch genealogy and anti-counterfeit intelligence"
-        icon={<ScanLine size={22} />}
-      >
+    <TexturaShell
+      eyebrow="GS1 · Chain of custody"
+      title="Track & Trace"
+      subtitle="GS1 serialization, batch genealogy and anti-counterfeit intelligence"
+      icon={<ScanLine size={22} />}
+      actions={
         <Badge tone={suspectCount ? "critical" : "ok"} pulse={suspectCount > 0}>
           {suspectCount} suspect units
         </Badge>
-      </PageHeader>
+      }
+    >
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
@@ -293,6 +294,6 @@ export default function TracePage() {
           </div>
         </Card>
       </div>
-    </div>
+    </TexturaShell>
   );
 }

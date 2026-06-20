@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Snowflake, Thermometer, AlertTriangle, Droplets } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { TempProfileChart } from "@/components/charts/charts";
 import { getData, sensorSeries } from "@/lib/data/engine";
@@ -43,20 +43,21 @@ export default function ColdChainPage() {
     : 0;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Cold Chain Monitoring"
-        subtitle="WHO-GDP temperature integrity for vaccines, biologics & insulin"
-        icon={<Snowflake size={22} />}
-      >
-        {liveBreaches > 0 ? (
+    <TexturaShell
+      eyebrow="WHO-GDP · MKT"
+      title="Cold Chain Monitoring"
+      subtitle="WHO-GDP temperature integrity for vaccines, biologics & insulin"
+      icon={<Snowflake size={22} />}
+      actions={
+        liveBreaches > 0 ? (
           <Badge tone="critical" pulse>
             {liveBreaches} live breach{liveBreaches > 1 ? "es" : ""}
           </Badge>
         ) : (
           <Badge tone="ok">In tolerance</Badge>
-        )}
-      </PageHeader>
+        )
+      }
+    >
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
@@ -156,10 +157,10 @@ export default function ColdChainPage() {
                 <TempProfileChart data={series} range={selected.tempRange} />
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[var(--color-muted)]">
                   <span className="flex items-center gap-1.5">
-                    <span className="h-2 w-3 rounded bg-[#38bdf8]" /> Sensor temperature
+                    <span className="h-2 w-3 rounded bg-[#a1ecff]" /> Sensor temperature
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="h-2 w-3 rounded border border-dashed border-[#34d399] bg-[#34d39922]" />
+                    <span className="h-2 w-3 rounded border border-dashed border-[#a1ecff] bg-[#a1ecff22]" />
                     Acceptable band
                   </span>
                   <span className="flex items-center gap-1.5">
@@ -235,6 +236,6 @@ export default function ColdChainPage() {
           </table>
         </div>
       </Card>
-    </div>
+    </TexturaShell>
   );
 }

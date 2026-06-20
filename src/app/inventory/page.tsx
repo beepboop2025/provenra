@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PackageSearch, TrendingUp, CalendarClock, Boxes, Globe2 } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { DemandForecastChart } from "@/components/charts/charts";
 import { getData, demandSeries } from "@/lib/data/engine";
@@ -50,16 +50,17 @@ export default function InventoryPage() {
   const singleSourced = data.products.filter((p) => p.singleSource).length;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Shortage & Inventory Risk"
-        subtitle="Demand forecasting, stockout prediction and FEFO expiry control"
-        icon={<PackageSearch size={22} />}
-      >
+    <TexturaShell
+      eyebrow="Forecast · Expiry · Resilience"
+      title="Shortage & Inventory Risk"
+      subtitle="Demand forecasting, stockout prediction and FEFO expiry control"
+      icon={<PackageSearch size={22} />}
+      actions={
         <Badge tone={stockouts ? "critical" : lowStock ? "warn" : "ok"}>
           {stockouts} stockouts · {lowStock} low
         </Badge>
-      </PageHeader>
+      }
+    >
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
@@ -106,9 +107,9 @@ export default function InventoryPage() {
             </div>
             <DemandForecastChart data={series} />
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[var(--color-muted)]">
-              <span className="flex items-center gap-1.5"><span className="h-2 w-3 rounded bg-[#2dd4bf]" /> Actual offtake</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-3 rounded bg-[#a78bfa]" /> Forecast</span>
-              <span className="flex items-center gap-1.5"><span className="h-2 w-3 rounded bg-[#a78bfa44]" /> Confidence band</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-3 rounded bg-[#a1ecff]" /> Actual offtake</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-3 rounded bg-[#ffab98]" /> Forecast</span>
+              <span className="flex items-center gap-1.5"><span className="h-2 w-3 rounded bg-[#ffab9844]" /> Confidence band</span>
             </div>
           </div>
         </Card>
@@ -257,6 +258,6 @@ export default function InventoryPage() {
           </table>
         </div>
       </Card>
-    </div>
+    </TexturaShell>
   );
 }

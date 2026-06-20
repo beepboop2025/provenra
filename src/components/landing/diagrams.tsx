@@ -8,18 +8,18 @@ import * as React from "react";
 // Dark palette — matches the app's design tokens (the /intro landing now uses
 // the same dark theme as the rest of the site).
 const C = {
-  surface: "#0f1626",
-  surface2: "#151e30",
-  border: "#26334d",
-  fg: "#e6edf6",
-  muted: "#8a99b0",
-  faint: "#5a6a82",
-  brand: "#2dd4bf",
-  violet: "#a78bfa",
-  ok: "#34d399",
-  warn: "#fbbf24",
-  danger: "#f87171",
-  info: "#60a5fa",
+  surface: "#0b0b0c",
+  surface2: "#161618",
+  border: "#ffffff1f",
+  fg: "#fafafa",
+  muted: "#b4b4b6",
+  faint: "#ffffff66",
+  brand: "#a1ecff",
+  violet: "#c6b4f5",
+  ok: "#7fe0c2",
+  warn: "#f0c987",
+  danger: "#ff9d88",
+  info: "#a1ecff",
 };
 
 type Props = { className?: string };

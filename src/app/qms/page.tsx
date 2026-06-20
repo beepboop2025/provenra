@@ -9,7 +9,7 @@ import {
   AlertOctagon,
   Link2,
 } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { qmsHealthScore } from "@/lib/analytics";
@@ -74,16 +74,17 @@ export default function QmsPage() {
     data.capas.filter((c) => (col === "open" ? c.status === "open" || c.status === "overdue" : c.status === col));
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Quality Management System"
-        subtitle="Deviations, CAPA lifecycle, batch release records and a tamper-evident audit trail"
-        icon={<ClipboardCheck size={22} />}
-      >
+    <TexturaShell
+      eyebrow="Deviations · CAPA · Audit"
+      title="Quality Management System"
+      subtitle="Deviations, CAPA lifecycle, batch release records and a tamper-evident audit trail"
+      icon={<ClipboardCheck size={22} />}
+      actions={
         <Badge tone={health >= 75 ? "ok" : health >= 50 ? "warn" : "critical"} pulse>
           QMS health {health}/100
         </Badge>
-      </PageHeader>
+      }
+    >
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
@@ -297,6 +298,6 @@ export default function QmsPage() {
           </ul>
         </Card>
       </div>
-    </div>
+    </TexturaShell>
   );
 }
