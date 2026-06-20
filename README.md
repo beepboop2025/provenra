@@ -4,7 +4,34 @@ Enterprise pharmaceutical supply-chain command center. **India-first** (CDSCO /
 DAVA-iVEDA serialization, Schedule M, NLEM, WHO-GDP) with **international markets**
 (US DSCSA, EU FMD) registered in the data model for expansion.
 
-Built with **Next.js 16 + TypeScript (strict) + Tailwind v4 + Recharts**.
+Built with **Next.js 16 + TypeScript (strict) + Tailwind v4 + Recharts**, fronted by an
+immersive **React Three Fiber + react-spring** marketing landing.
+
+## The landing — `/intro`
+
+A full-bleed, immersive landing in the visual language of award-winning agency sites: a
+WebGL liquid hero, per-letter spring-physics text, inertial smooth scroll and a
+scroll-driven camera — on a pure-black stage with an icy + peach accent.
+
+![VitalChain landing — hero](docs/screenshots/landing-hero.png)
+
+| Platform / features | Mobile |
+|---|---|
+| ![Platform section](docs/screenshots/landing-platform.png) | <img src="docs/screenshots/landing-mobile.png" width="240" alt="VitalChain landing on mobile" /> |
+
+**How it's built**
+- **3D hero** — `three` + `@react-three/fiber` + `@react-three/drei`: a liquid
+  Perlin-noise blob (`MeshDistortMaterial`) under **bloom**
+  (`@react-three/postprocessing`), with a scroll-driven camera dolly and pointer parallax.
+  Dynamically imported `ssr:false` from a Client Component, so it never runs during
+  prerender — **zero hydration errors**.
+- **Motion** — `@react-spring/web` physics (not CSS transitions): per-letter `useTrail`
+  text reveals and `useSpring` scroll reveals, all `aria`-safe and
+  `prefers-reduced-motion` aware.
+- **Smooth scroll** — `lenis`, scoped to the landing only (the data-dense dashboard keeps
+  native scrolling).
+- **SEO preserved** — `/intro/page.tsx` stays a Server Component (metadata + JSON-LD)
+  rendering a client landing; `AppShell` renders it full-bleed (no dashboard chrome).
 
 ## The seven modules
 
@@ -37,6 +64,8 @@ src/
     dashboard/         # PageHeader, KpiCard, AlertFeed
     charts/            # Recharts wrappers (temp profile, demand forecast, donut, bars)
     map/               # dependency-free SVG India map with projected nodes + animated routes
+    landing/           # ⭐ Textura-style /intro: WebGL hero-scene, split-text (spring),
+                       #    reveal (spring), smooth-scroll (Lenis), SVG feature diagrams
   lib/
     types.ts           # ⭐ the domain model — the regulatory vocabulary as TypeScript
     analytics.ts       # MKT, stock health, shortage/supplier scoring, FEFO

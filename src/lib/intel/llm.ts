@@ -1,15 +1,21 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { availableProviders } from "@/lib/free-llm-router/providers";
+import { getFreeRouter, type ChatMessage } from "@/lib/free-llm-router/router";
 
 /**
  * Provider-agnostic LLM adapter for the intel agents.
  *
- * Picks whatever key is configured, in order:
- *   1. GEMINI_API_KEY   → Google Gemini (FREE tier; reads PDFs natively)
- *   2. ANTHROPIC_API_KEY → Claude (paid API)
- *   3. none             → callers use their deterministic fallback
+ * Resolution order:
+ *   1. Free LLM router → fails over across Groq/Cerebras/Gemini/Mistral/OpenRouter
+ *      (text-only requests). Perpetually-free; multi-provider resilience.
+ *   2. GEMINI_API_KEY   → Google Gemini native (required for PDF-grounded extraction)
+ *   3. ANTHROPIC_API_KEY → Claude (paid API)
+ *   4. none             → callers use their deterministic fallback
  *
- * One small surface (`llmText`) handles both plain JSON generation and
- * PDF-grounded extraction, so the briefing and CDSCO agents stay provider-neutral.
+ * PDF requests bypass the router (inline-PDF grounding isn't portable across the
+ * OpenAI-compatible shims) and go straight to the native Gemini/Claude path.
+ *
+ * One small surface (`llmText`) keeps the briefing and CDSCO agents provider-neutral.
  */
 
 export type LlmInfo = {
@@ -19,8 +25,12 @@ export type LlmInfo = {
 };
 
 export function llmInfo(): LlmInfo {
-  if (process.env.GEMINI_API_KEY) {
-    return { enabled: true, provider: "gemini", model: process.env.GEMINI_MODEL || "gemini-flash-latest" };
+  // Any free-provider key (incl. GEMINI_API_KEY, which the router reuses) enables LLM.
+  if (availableProviders().length > 0) {
+    if (process.env.GEMINI_API_KEY) {
+      return { enabled: true, provider: "gemini", model: process.env.GEMINI_MODEL || "gemini-flash-latest" };
+    }
+    return { enabled: true, provider: "gemini", model: "free-router" };
   }
   if (process.env.ANTHROPIC_API_KEY) {
     return { enabled: true, provider: "claude", model: "claude-opus-4-8" };
@@ -37,14 +47,44 @@ export interface LlmRequest {
 }
 
 export async function llmText(req: LlmRequest): Promise<{ text: string; model: string } | null> {
+  // Text-only path → multi-provider free router with failover.
+  if (!req.pdfBase64) {
+    const viaRouter = await viaFreeRouter(req);
+    if (viaRouter) return viaRouter;
+    // fall through to native providers if the router has no providers / all failed
+  }
+
   const info = llmInfo();
   try {
-    if (info.provider === "gemini") return await viaGemini(req, info.model);
-    if (info.provider === "claude") return await viaClaude(req, info.model);
+    if (process.env.GEMINI_API_KEY) return await viaGemini(req, process.env.GEMINI_MODEL || "gemini-flash-latest");
+    if (process.env.ANTHROPIC_API_KEY) return await viaClaude(req, "claude-opus-4-8");
   } catch {
     return null;
   }
   return null;
+}
+
+async function viaFreeRouter(req: LlmRequest): Promise<{ text: string; model: string } | null> {
+  const router = getFreeRouter();
+  if (!router.hasProviders) return null;
+  const system = req.json
+    ? `${req.system}\n\nRespond with valid JSON only — no prose, no code fences.`
+    : req.system;
+  const messages: ChatMessage[] = [
+    { role: "system", content: system },
+    { role: "user", content: req.user },
+  ];
+  try {
+    const result = await router.chatCompletion(messages, {
+      taskType: req.json ? "factual" : "summarization",
+      maxTokens: req.maxTokens ?? 2048,
+      temperature: 0.2,
+    });
+    const text = (result.text ?? "").trim();
+    return text ? { text, model: `${result.provider}:${result.model}` } : null;
+  } catch {
+    return null;
+  }
 }
 
 async function viaGemini(req: LlmRequest, model: string): Promise<{ text: string; model: string } | null> {

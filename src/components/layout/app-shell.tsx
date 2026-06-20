@@ -39,10 +39,19 @@ const NAV = [
   { href: "/intro", label: "Intro", icon: Clapperboard, module: null },
 ] as const;
 
+// Routes that render full-bleed, without the dashboard sidebar/header chrome —
+// the immersive marketing landing brings its own navigation.
+const FULL_BLEED = new Set<string>(["/intro"]);
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const data = getData();
+
+  // Landing pages escape the app chrome entirely.
+  if (FULL_BLEED.has(pathname)) {
+    return <div className="relative z-10">{children}</div>;
+  }
 
   const unacked = data.alerts.filter((a) => !a.acknowledged);
   const critical = unacked.filter((a) => a.severity === "critical").length;

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { createElement, useEffect, useRef, useState, type ElementType } from "react";
+import { animated, useSpring } from "@react-spring/web";
 
 /**
- * Scroll-reveal wrapper. Adds `.reveal-in` when the element scrolls into view
- * (once), driving the rise+fade defined in globals.css. Respects reduced-motion
- * via the CSS guard. `delay` staggers siblings.
+ * Scroll-reveal wrapper, spring-physics edition (matches Textura's react-spring
+ * approach rather than CSS transitions). Springs from translated+transparent to
+ * resting when the element scrolls into view (once). `delay` staggers siblings;
+ * reduced-motion makes it immediate.
  */
 export function Reveal({
   children,
@@ -21,6 +22,7 @@ export function Reveal({
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const [shown, setShown] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
@@ -32,20 +34,44 @@ export function Reveal({
           io.disconnect();
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
-  return (
-    <Tag
-      // @ts-expect-error — ref typing across the union of tag names is fine here
-      ref={ref}
-      className={cn("reveal", shown && "reveal-in", className)}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </Tag>
+  const styles = useSpring({
+    opacity: shown ? 1 : 0,
+    y: shown ? 0 : 34,
+    from: { opacity: 0, y: 34 },
+    config: { tension: 210, friction: 30 },
+    delay,
+    immediate: reduced,
+  });
+
+  const A = animated[Tag] as ElementType;
+  return createElement(
+    A,
+    {
+      ref,
+      className,
+      style: {
+        opacity: styles.opacity,
+        transform: styles.y.to((v) => `translateY(${v}px)`),
+      },
+    },
+    children,
   );
+}
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const on = () => setReduced(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return reduced;
 }
