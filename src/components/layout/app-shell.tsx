@@ -39,9 +39,22 @@ const NAV = [
   { href: "/intro", label: "Intro", icon: Clapperboard, module: null },
 ] as const;
 
-// Routes that render full-bleed, without the dashboard sidebar/header chrome —
-// the immersive landing and Command Center bring their own navigation.
-const FULL_BLEED = new Set<string>(["/intro", "/"]);
+// Routes that render full-bleed, without the dashboard sidebar/header chrome.
+// Every Textura surface brings its own navigation (the Textura top nav +
+// full-screen index), so the whole app is now full-bleed.
+const FULL_BLEED = new Set<string>([
+  "/intro",
+  "/",
+  "/trace",
+  "/quality",
+  "/qms",
+  "/coldchain",
+  "/warehouse",
+  "/inventory",
+  "/compliance",
+  "/intel",
+  "/verify",
+]);
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

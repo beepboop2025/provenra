@@ -8,26 +8,30 @@
  */
 
 @theme {
-  --color-bg: #0a0f1a;
-  --color-surface: #0f1626;
-  --color-surface-2: #151e30;
-  --color-border: #1f2a3f;
-  --color-border-soft: #18233650;
+  /* Textura palette — the whole app is now the immersive Textura surface, so
+     the design tokens themselves are the Textura world: pure-black ink, hairline
+     white borders, the icy-blue + peach accents, and a refined, desaturated
+     severity set that sits elegantly on black instead of bright dashboard RGB. */
+  --color-bg: #000000;
+  --color-surface: #0b0b0c;
+  --color-surface-2: #161618;
+  --color-border: #ffffff1f;
+  --color-border-soft: #ffffff12;
 
-  --color-fg: #e6edf6;
-  --color-muted: #8a99b0;
-  --color-faint: #5a6a82;
+  --color-fg: #fafafa;
+  --color-muted: #b4b4b6;
+  --color-faint: #ffffff66;
 
-  --color-brand: #2dd4bf;
-  --color-brand-dim: #134e4a;
-  --color-accent: #38bdf8;
+  --color-brand: #a1ecff;
+  --color-brand-dim: #16323a;
+  --color-accent: #ffab98;
 
-  --color-ok: #34d399;
-  --color-warn: #fbbf24;
-  --color-danger: #f87171;
-  --color-critical: #fb3b6b;
-  --color-info: #60a5fa;
-  --color-violet: #a78bfa;
+  --color-ok: #7fe0c2;
+  --color-warn: #f0c987;
+  --color-danger: #ff9d88;
+  --color-critical: #ff7a63;
+  --color-info: #a1ecff;
+  --color-violet: #c6b4f5;
 
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -53,7 +57,7 @@
   /* Depth tokens — layered shadows give the dark surfaces real elevation. */
   --shadow-panel: 0 1px 0 0 #ffffff08 inset, 0 8px 24px -12px #00000080;
   --shadow-lift: 0 1px 0 0 #ffffff10 inset, 0 18px 40px -16px #000000cc;
-  --glow-brand: 0 0 24px -6px #2dd4bf66;
+  --glow-brand: 0 0 24px -6px #a1ecff66;
 }
 
 html {
@@ -63,9 +67,8 @@ html {
 
 body {
   background:
-    radial-gradient(1100px 560px at 82% -12%, #0e2a3355 0%, transparent 58%),
-    radial-gradient(900px 520px at -8% 6%, #1a213d4d 0%, transparent 55%),
-    radial-gradient(700px 700px at 50% 120%, #11203a40 0%, transparent 60%),
+    radial-gradient(1100px 560px at 82% -12%, #a1ecff10 0%, transparent 58%),
+    radial-gradient(900px 520px at -8% 6%, #ffab980b 0%, transparent 55%),
     var(--color-bg);
   background-attachment: fixed;
   color: var(--color-fg);
@@ -107,7 +110,7 @@ h1,
 
 ::selection {
   background: var(--color-brand);
-  color: #04201c;
+  color: #021016;
 }
 
 /* Thin, on-brand scrollbars for the data-dense panels. */
@@ -187,8 +190,8 @@ h1,
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .vc-card:hover {
-  border-color: #2a3a55;
-  box-shadow: var(--shadow-lift);
+  border-color: #a1ecff33;
+  box-shadow: var(--shadow-lift), 0 0 28px -14px #a1ecff40;
 }
 /* Interactive panels (clickable) get a subtle lift + brand-tinted edge. */
 .vc-card-interactive {
@@ -387,6 +390,18 @@ html.lenis body {
   font-family: var(--font-body);
   font-weight: 300;
 }
+/* Headings inside a Textura surface use Gilda (the shared CardHeader/PageHeader
+   render plain h2/h3 that would otherwise stay sans). */
+.tx-stage h2,
+.tx-stage h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+/* Card hover edge picks up the icy accent rather than the old teal-grey. */
+.tx-stage .vc-card:hover {
+  border-color: #a1ecff55;
+}
 /* Gilda ships a single 400 weight — never let a bold utility synthesize it. */
 .tx-stage .tx-display {
   font-family: var(--font-display);
@@ -522,6 +537,43 @@ html.cc-fluid {
 @media (max-width: 1440px) { html.cc-fluid { font-size: 1.111111vw; } }
 @media (max-width: 1024px) { html.cc-fluid { font-size: 1.562500vw; } }
 @media (max-width: 576px)  { html.cc-fluid { font-size: 4.102564vw; } }
+
+/* ── Smoothness & interactivity ──────────────────────────────────────────
+   Buttery hover/focus feedback everywhere inside a Textura surface, so the
+   whole page feels alive rather than static. */
+.tx-stage a,
+.tx-stage button,
+.tx-stage select,
+.tx-stage input,
+.tx-stage [role="button"],
+.tx-stage .vc-card,
+.tx-stage tr {
+  transition:
+    color 0.22s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)),
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.25s ease,
+    opacity 0.22s ease,
+    transform 0.25s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+}
+/* Data tables: rows lift their tint smoothly and reveal an icy edge on hover. */
+.tx-stage tbody tr:hover {
+  background: #ffffff06;
+}
+.tx-stage tbody tr {
+  box-shadow: inset 2px 0 0 0 transparent;
+}
+.tx-stage tbody tr:hover {
+  box-shadow: inset 2px 0 0 0 #a1ecff66;
+}
+/* Inputs/selects glow icy on focus. */
+.tx-stage input:focus,
+.tx-stage select:focus,
+.tx-stage textarea:focus {
+  border-color: #a1ecff66;
+  box-shadow: 0 0 0 3px #a1ecff1f;
+  outline: none;
+}
 
 /* Respect reduced-motion: kill all non-essential animation (a11y requirement). */
 @media (prefers-reduced-motion: reduce) {

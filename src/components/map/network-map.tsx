@@ -14,17 +14,25 @@ function project(lat: number, lng: number) {
   return { x, y };
 }
 
+// Quantize coordinates before they enter SVG attribute strings. Functions like
+// Math.hypot can differ in the last float digit between Node (SSR) and the
+// browser, which bakes a different `d`/`cx` string into each render and trips
+// React's hydration check. Rounding to 2dp collapses that noise — sub-pixel on
+// a 460-unit viewBox, so it's visually lossless.
+const r = (n: number) => Math.round(n * 100) / 100;
+
 const inIndia = (f: Facility) =>
   f.location.market === "IN" &&
   f.location.lat >= BOUNDS.latMin &&
   f.location.lat <= BOUNDS.latMax;
 
+// Textura palette: icy routes, refined amber/coral severity, peach hubs.
 const statusColor: Record<Shipment["status"], string> = {
-  in_transit: "#38bdf8",
-  delivered: "#34d399",
-  delayed: "#fbbf24",
-  exception: "#fb3b6b",
-  scheduled: "#8a99b0",
+  in_transit: "#a1ecff",
+  delivered: "#7fe0c2",
+  delayed: "#f0c987",
+  exception: "#ff7a63",
+  scheduled: "#8a8a8c",
 };
 
 export function NetworkMap({
@@ -56,7 +64,7 @@ export function NetworkMap({
             y1={0}
             x2={(W / 6) * i}
             y2={H}
-            stroke="#1f2a3f"
+            stroke="#ffffff10"
             strokeWidth={0.5}
           />
         ))}
@@ -67,7 +75,7 @@ export function NetworkMap({
             y1={(H / 8) * i}
             x2={W}
             y2={(H / 8) * i}
-            stroke="#1f2a3f"
+            stroke="#ffffff10"
             strokeWidth={0.5}
           />
         ))}
@@ -84,7 +92,7 @@ export function NetworkMap({
           return (
             <g key={s.id} opacity={hover && hover !== s.id ? 0.25 : 1}>
               <path
-                d={`M ${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}`}
+                d={`M ${r(a.x)} ${r(a.y)} Q ${r(mx)} ${r(my)} ${r(b.x)} ${r(b.y)}`}
                 fill="none"
                 stroke={color}
                 strokeWidth={s.status === "exception" ? 2 : 1.2}
@@ -92,8 +100,8 @@ export function NetworkMap({
                 className="vc-flow"
               />
               <circle
-                cx={px}
-                cy={py}
+                cx={r(px)}
+                cy={r(py)}
                 r={s.status === "exception" ? 4 : 3}
                 fill={color}
                 className={s.status === "exception" ? "vc-pulse" : ""}
@@ -112,19 +120,19 @@ export function NetworkMap({
           return (
             <g key={f.id}>
               <circle
-                cx={p.x}
-                cy={p.y}
+                cx={r(p.x)}
+                cy={r(p.y)}
                 r={isMfg ? 3.5 : 2.5}
-                fill={isMfg ? "#2dd4bf" : "#5a6a82"}
-                stroke="#0a0f1a"
+                fill={isMfg ? "#ffab98" : "#6f6f72"}
+                stroke="#000000"
                 strokeWidth={1}
               />
               {isMfg && (
                 <text
-                  x={p.x + 6}
-                  y={p.y + 3}
+                  x={r(p.x + 6)}
+                  y={r(p.y + 3)}
                   fontSize={8}
-                  fill="#8a99b0"
+                  fill="#b4b4b6"
                   className="select-none"
                 >
                   {f.location.city}
@@ -137,10 +145,10 @@ export function NetworkMap({
 
       {/* legend */}
       <div className="absolute bottom-2 left-2 flex flex-wrap gap-x-3 gap-y-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)]/80 px-3 py-2 text-[10px] text-[var(--color-muted)] backdrop-blur">
-        <Legend color="#2dd4bf" label="Manufacturing" />
-        <Legend color="#38bdf8" label="In transit" />
-        <Legend color="#fbbf24" label="Delayed" />
-        <Legend color="#fb3b6b" label="Excursion" />
+        <Legend color="#ffab98" label="Manufacturing" />
+        <Legend color="#a1ecff" label="In transit" />
+        <Legend color="#f0c987" label="Delayed" />
+        <Legend color="#ff7a63" label="Excursion" />
       </div>
     </div>
   );

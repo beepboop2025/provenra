@@ -154,16 +154,18 @@ export const PRODUCTS: ProductSeed[] = [
   { name: "Shycocan", generic: "Recombinant Antibody", form: "biologic", strength: "40mg", category: "Immunology", schedule: "H1", storage: "refrigerated", tempMin: 2, tempMax: 8, mrp: 9800, essential: false },
 ];
 
+// Harmonized Textura categorical palette: a refined sweep from icy → mint →
+// lavender → peach → coral, all desaturated to sit on pure black (no rainbow).
 export const THERAPEUTIC_COLORS: Record<string, string> = {
-  Vaccines: "#22d3ee",
-  Diabetology: "#a78bfa",
-  Oncology: "#f472b6",
-  Neurology: "#60a5fa",
-  "Anti-infectives": "#4ade80",
-  Analgesics: "#fbbf24",
-  Gastrology: "#fb923c",
-  Cardiology: "#f87171",
-  Immunology: "#34d399",
+  Vaccines: "#a1ecff",
+  Diabetology: "#c6b4f5",
+  Oncology: "#e6a8c8",
+  Neurology: "#7fc8e8",
+  "Anti-infectives": "#7fe0c2",
+  Analgesics: "#f0c987",
+  Gastrology: "#f0a987",
+  Cardiology: "#ff7a63",
+  Immunology: "#9fd8c4",
 };
 
 /** Indian states/UTs used for cross-state recall tracking. */

@@ -10,7 +10,7 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { TexturaShell } from "@/components/command/textura-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { fefoPickRate, pickFillRate } from "@/lib/analytics";
@@ -52,16 +52,17 @@ export default function WarehousePage() {
   );
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Warehouse Management"
-        subtitle="FEFO-enforced picking, zoned putaway and dispatch — the physical execution layer"
-        icon={<Warehouse size={22} />}
-      >
+    <TexturaShell
+      eyebrow="FEFO execution"
+      title="Warehouse Management"
+      subtitle="FEFO-enforced picking, zoned putaway and dispatch — the physical execution layer"
+      icon={<Warehouse size={22} />}
+      actions={
         <Badge tone={fefoAccuracy >= 95 ? "ok" : fefoAccuracy >= 85 ? "warn" : "critical"} pulse>
           FEFO accuracy {fefoAccuracy}%
         </Badge>
-      </PageHeader>
+      }
+    >
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
@@ -219,6 +220,6 @@ export default function WarehousePage() {
           </ul>
         </Card>
       </div>
-    </div>
+    </TexturaShell>
   );
 }
