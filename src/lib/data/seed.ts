@@ -154,7 +154,7 @@ export const PRODUCTS: ProductSeed[] = [
   { name: "Shycocan", generic: "Recombinant Antibody", form: "biologic", strength: "40mg", category: "Immunology", schedule: "H1", storage: "refrigerated", tempMin: 2, tempMax: 8, mrp: 9800, essential: false },
 ];
 
-// Harmonized Textura categorical palette: a refined sweep from icy → mint →
+// Harmonized Editorial categorical palette: a refined sweep from icy → mint →
 // lavender → peach → coral, all desaturated to sit on pure black (no rainbow).
 export const THERAPEUTIC_COLORS: Record<string, string> = {
   Vaccines: "#a1ecff",

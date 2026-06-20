@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TexturaLanding } from "@/components/landing/textura-landing";
+import { Landing } from "@/components/landing/landing";
 
 export const metadata: Metadata = {
   title: "VitalChain — Catch the bad batch before it reaches a patient",
@@ -15,5 +15,5 @@ export const metadata: Metadata = {
  * coexist with full SEO, with no hydration mismatch.
  */
 export default function IntroPage() {
-  return <TexturaLanding />;
+  return <Landing />;
 }

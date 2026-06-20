@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { animated, useSpring } from "@react-spring/web";
 
 /**
- * Assets-loader preloader — Textura's signature open (discovery §4.3: the root
+ * Assets-loader preloader — The signature open (the root
  * is emitted at opacity 0 and an `assets-loader-layout` fades the content in
  * once ready). Here: a black stage with the wordmark and a thin counter that
  * runs to 100, then springs away to reveal the Command Center.
  *
- * Spring-physics only (no CSS keyframes), matching Textura's motion philosophy.
+ * Spring-physics only (no CSS keyframes), matching the spring-physics motion philosophy.
  * Under reduced motion it resolves instantly. The counter is cosmetic — it is
  * not wired to real asset progress, so it never blocks interaction.
  */
@@ -62,7 +62,7 @@ export function CommandLoader() {
       style={{ opacity: styles.opacity, pointerEvents: done ? "none" : "auto" }}
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black"
     >
-      <div className="tx-display text-3xl tracking-tight text-warm-strong lg:text-4xl">
+      <div className="ed-display text-3xl tracking-tight text-warm-strong lg:text-4xl">
         <span className="cc-mark-box" />
         VITAL<span className="cc-ink">CHAIN</span>
       </div>

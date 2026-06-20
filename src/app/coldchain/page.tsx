@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Snowflake, Thermometer, AlertTriangle, Droplets } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { TempProfileChart } from "@/components/charts/charts";
 import { getData, sensorSeries } from "@/lib/data/engine";
@@ -43,7 +43,7 @@ export default function ColdChainPage() {
     : 0;
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="WHO-GDP · MKT"
       title="Cold Chain Monitoring"
       subtitle="WHO-GDP temperature integrity for vaccines, biologics & insulin"
@@ -236,6 +236,6 @@ export default function ColdChainPage() {
           </table>
         </div>
       </Card>
-    </TexturaShell>
+    </CommandShell>
   );
 }

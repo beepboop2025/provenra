@@ -1,7 +1,7 @@
 "use client";
 
 import { ShieldCheck, Recycle, Factory, FileCheck2, Info, ClipboardCheck } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { getData } from "@/lib/data/engine";
 import { formatDate, formatNumber, formatPct, formatRelative } from "@/lib/format";
@@ -47,7 +47,7 @@ export default function CompliancePage() {
     : 0;
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="Recalls · Schedule M · DSCSA"
       title="Recall & Compliance"
       subtitle="Recall orchestration, supplier risk and multi-market regulatory posture"
@@ -272,7 +272,7 @@ export default function CompliancePage() {
           </ul>
         </div>
       </Card>
-    </TexturaShell>
+    </CommandShell>
   );
 }
 

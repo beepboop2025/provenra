@@ -10,7 +10,7 @@ import {
   MapPin,
   PackageCheck,
 } from "lucide-react";
-import { TexturaShell } from "@/components/command/textura-shell";
+import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
 import { DonutChart } from "@/components/charts/charts";
 import { getData, chainOfCustody } from "@/lib/data/engine";
@@ -85,7 +85,7 @@ export default function TracePage() {
   const suspectCount = data.serials.filter((s) => s.status === "suspect" || s.riskScore >= 70).length;
 
   return (
-    <TexturaShell
+    <CommandShell
       eyebrow="GS1 · Chain of custody"
       title="Track & Trace"
       subtitle="GS1 serialization, batch genealogy and anti-counterfeit intelligence"
@@ -294,6 +294,6 @@ export default function TracePage() {
           </div>
         </Card>
       </div>
-    </TexturaShell>
+    </CommandShell>
   );
 }

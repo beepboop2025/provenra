@@ -32,7 +32,7 @@ import { formatCompact, formatDate } from "@/lib/format";
 import type { Kpi } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-// WebGL hero, client-only — the liquid blob (cf. textura-agency/liquid-threejs-ball).
+// WebGL hero, client-only — the liquid blob.
 const HeroScene = dynamic(() => import("@/components/landing/hero-scene"), {
   ssr: false,
   loading: () => null,
@@ -78,7 +78,7 @@ export function CommandCenter() {
   const webgl = useWebGL();
   const animate = webgl && !reduced;
 
-  // Textura's fluid-rem grid: scale the whole UI as one, only while mounted.
+  // Editorial's fluid-rem grid: scale the whole UI as one, only while mounted.
   // Also pin the entry at the top (the hero is the "moment") and stop the
   // browser from restoring a prior scroll position under Lenis.
   useEffect(() => {
@@ -129,14 +129,14 @@ export function CommandCenter() {
   ];
 
   return (
-    <div className="cc-stage tx-stage relative min-h-screen overflow-x-clip">
+    <div className="cc-stage ed-stage relative min-h-screen overflow-x-clip">
       <CommandLoader />
       <SmoothScroll />
       <CommandNav />
 
-      {/* ── Hero (centered Textura composition) ────────────────────────── */}
+      {/* ── Hero (centered Editorial composition) ────────────────────────── */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden text-center">
-        {/* Liquid blob, dimmed to an ambient glow (Textura's hero is near-black;
+        {/* Liquid blob, dimmed to an ambient glow (Editorial's hero is near-black;
             the blob is atmosphere, not the subject). */}
         <div className="pointer-events-none absolute inset-0 z-0 opacity-60" aria-hidden="true">
           {webgl && <HeroScene animate={animate} />}
@@ -150,13 +150,13 @@ export function CommandCenter() {
         />
 
         <div className="relative z-10 mx-auto w-full max-w-5xl px-5 pt-20">
-          <h1 className="cc-hero-mark tx-display whitespace-nowrap text-warm-strong">
+          <h1 className="cc-hero-mark ed-display whitespace-nowrap text-warm-strong">
             <span className="cc-mark-box" aria-hidden="true" />
             <SplitText as="span" text="VITALCHAIN" className="inline" delay={120} />
           </h1>
           {/* Plain text (not SplitText): the cc-ink gradient needs the glyphs to
               live directly on the gradient element, not in nested letter spans. */}
-          <Reveal as="div" delay={320} className="tx-display cc-ink mt-2 text-3xl leading-none sm:text-5xl lg:text-6xl">
+          <Reveal as="div" delay={320} className="ed-display cc-ink mt-2 text-3xl leading-none sm:text-5xl lg:text-6xl">
             command center
           </Reveal>
 
@@ -194,20 +194,20 @@ export function CommandCenter() {
 
         {/* Scroll cue */}
         <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-warm/50">
-          <div className="tx-bob flex flex-col items-center gap-1">
-            <span className="tx-eyebrow !text-[0.6rem]">Scroll</span>
+          <div className="ed-bob flex flex-col items-center gap-1">
+            <span className="ed-eyebrow !text-[0.6rem]">Scroll</span>
             <span className="h-8 w-px bg-warm/30" />
           </div>
         </div>
       </section>
 
       {/* ── Module marquee ─────────────────────────────────────────────── */}
-      <div className="tx-marquee-row relative overflow-hidden border-y border-white/10 py-6">
-        <div className="tx-marquee">
+      <div className="ed-marquee-row relative overflow-hidden border-y border-white/10 py-6">
+        <div className="ed-marquee">
           {[0, 1].map((dup) => (
             <span key={dup} aria-hidden={dup === 1} className="flex shrink-0 items-center">
               {MARQUEE.map((m) => (
-                <span key={m} className="tx-display flex items-center text-3xl text-warm/80 lg:text-5xl">
+                <span key={m} className="ed-display flex items-center text-3xl text-warm/80 lg:text-5xl">
                   <span className="px-6">{m}</span>
                   <span className="cc-ink">/</span>
                 </span>
@@ -222,7 +222,7 @@ export function CommandCenter() {
         <Reveal className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 lg:grid-cols-4">
           {heroStats.map((s) => (
             <div key={s.label} className="bg-ink-2 px-6 py-10">
-              <div className="cc-ink tx-display text-5xl tabular-nums lg:text-6xl">{s.value}</div>
+              <div className="cc-ink ed-display text-5xl tabular-nums lg:text-6xl">{s.value}</div>
               <div className="mt-2 text-sm leading-snug text-warm/55">{s.label}</div>
             </div>
           ))}
@@ -250,14 +250,14 @@ export function CommandCenter() {
                 <Link
                   key={m.href}
                   href={m.href}
-                  className="tx-tile cc-link group block w-[19rem] overflow-hidden rounded-3xl border border-white/10 bg-ink-2 sm:w-[24rem]"
+                  className="ed-tile cc-link group block w-[19rem] overflow-hidden rounded-3xl border border-white/10 bg-ink-2 sm:w-[24rem]"
                 >
                   <div className="overflow-hidden p-8">
                     <Diagram />
                   </div>
                   <div className="flex items-center justify-between border-t border-white/10 px-7 py-5">
-                    <span className="tx-display text-xl text-warm-strong">{m.name}</span>
-                    <ArrowUpRight size={20} className="text-warm/40 transition-colors group-hover:text-[var(--color-tx-accent)]" />
+                    <span className="ed-display text-xl text-warm-strong">{m.name}</span>
+                    <ArrowUpRight size={20} className="text-warm/40 transition-colors group-hover:text-[var(--color-ed-accent)]" />
                   </div>
                 </Link>
               );
@@ -480,7 +480,7 @@ export function CommandCenter() {
                       .slice(0, 7)
                       .map((s) => (
                         <tr key={s.id} className="border-b border-white/10 transition-colors hover:bg-white/5">
-                          <td className="px-5 py-2.5 font-mono text-xs text-[var(--color-tx-accent)]">{s.ref}</td>
+                          <td className="px-5 py-2.5 font-mono text-xs text-[var(--color-ed-accent)]">{s.ref}</td>
                           <td className="px-5 py-2.5 text-xs text-warm/55">
                             {s.origin.location.city} → {s.destination.location.city}
                           </td>
@@ -515,7 +515,7 @@ export function CommandCenter() {
           <SplitText
             as="h2"
             text="Catch it before the patient does."
-            className="tx-display tx-h2 mx-auto block max-w-4xl text-warm-strong"
+            className="ed-display ed-h2 mx-auto block max-w-4xl text-warm-strong"
           />
           <p className="mx-auto mt-6 max-w-xl text-lg text-warm/60">
             Trace, cold chain, quality and recalls — moving together, in real time.
@@ -531,7 +531,7 @@ export function CommandCenter() {
         </div>
 
         <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-warm/40 sm:flex-row">
-          <span className="tx-display text-warm/70">
+          <span className="ed-display text-warm/70">
             <span className="cc-mark-box" aria-hidden="true" />
             VITAL<span className="cc-ink">CHAIN</span>
           </span>
@@ -544,14 +544,14 @@ export function CommandCenter() {
   );
 }
 
-/* ── Local Textura building blocks ────────────────────────────────────── */
+/* ── Local Editorial building blocks ────────────────────────────────────── */
 
 function Section({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
   return (
     <section className="mx-auto max-w-7xl px-5 py-16 lg:px-10 lg:py-20">
       <div className="mb-9">
-        <p className="tx-eyebrow text-[var(--color-tx-accent)]">{eyebrow}</p>
-        <SplitText as="h2" text={title} className="tx-display tx-h2 mt-3 block text-warm-strong" />
+        <p className="ed-eyebrow text-[var(--color-ed-accent)]">{eyebrow}</p>
+        <SplitText as="h2" text={title} className="ed-display ed-h2 mt-3 block text-warm-strong" />
       </div>
       {children}
     </section>
@@ -577,9 +577,9 @@ function Panel({
     <div className={cn("cc-panel cc-link overflow-hidden rounded-3xl", className)}>
       <div className="flex items-start justify-between gap-3 border-b border-white/10 px-5 py-4">
         <div className="flex min-w-0 items-center gap-2.5">
-          {icon && <span className="shrink-0 text-[var(--color-tx-accent)]">{icon}</span>}
+          {icon && <span className="shrink-0 text-[var(--color-ed-accent)]">{icon}</span>}
           <div className="min-w-0">
-            <h3 className="tx-display truncate text-lg text-warm-strong">{title}</h3>
+            <h3 className="ed-display truncate text-lg text-warm-strong">{title}</h3>
             {subtitle && <p className="truncate text-xs text-warm/50">{subtitle}</p>}
           </div>
         </div>
@@ -594,7 +594,7 @@ function PanelLink({ href, children }: { href: string; children: React.ReactNode
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1 text-xs text-[var(--color-tx-accent)] transition-all hover:gap-1.5"
+      className="inline-flex items-center gap-1 text-xs text-[var(--color-ed-accent)] transition-all hover:gap-1.5"
     >
       {children} <ArrowUpRight size={13} />
     </Link>
@@ -608,13 +608,13 @@ function KpiTile({ kpi }: { kpi: Kpi }) {
   return (
     <div className="cc-panel cc-link rounded-3xl p-5">
       <div className="flex items-start justify-between gap-2">
-        <span className="tx-eyebrow !text-[0.62rem] text-warm/45">{kpi.label}</span>
+        <span className="ed-eyebrow !text-[0.62rem] text-warm/45">{kpi.label}</span>
         <span className="flex items-center gap-0.5 text-[11px] font-semibold tabular-nums" style={{ color }}>
           {positive ? "▲" : "▼"} {Math.abs(kpi.delta).toFixed(1)}%
         </span>
       </div>
       <div className="mt-3 flex items-end justify-between gap-2">
-        <span className="tx-display text-4xl tabular-nums text-warm-strong">{kpi.value}</span>
+        <span className="ed-display text-4xl tabular-nums text-warm-strong">{kpi.value}</span>
         <Sparkline data={kpi.spark} color={color} width={84} height={30} />
       </div>
     </div>
@@ -634,26 +634,26 @@ function Stat({
     ok: "var(--color-ok)",
     warn: "var(--color-warn)",
     danger: "var(--color-danger)",
-    accent: "var(--color-tx-accent)",
+    accent: "var(--color-ed-accent)",
   }[tone];
   return (
     <div>
       <div className="text-[11px] text-warm/50">{label}</div>
-      <div className="tx-display mt-0.5 text-3xl tabular-nums" style={{ color }}>
+      <div className="ed-display mt-0.5 text-3xl tabular-nums" style={{ color }}>
         {value}
       </div>
     </div>
   );
 }
 
-/** Cookies-style notice card (the bottom-left furniture from textura.agency). */
+/** Cookies-style notice card (the bottom-left furniture). */
 function CookieNotice() {
   const [open, setOpen] = useState(true);
   if (!open) return null;
   return (
     <div className="cc-cookie fixed bottom-5 left-5 z-[55] max-w-sm rounded-2xl p-5">
       <div className="flex items-start justify-between gap-3">
-        <h4 className="tx-display text-xl text-warm-strong">Demo build</h4>
+        <h4 className="ed-display text-xl text-warm-strong">Demo build</h4>
         <button
           onClick={() => setOpen(false)}
           aria-label="Dismiss notice"

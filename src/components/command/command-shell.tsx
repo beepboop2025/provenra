@@ -39,16 +39,16 @@ function useWebGL() {
 }
 
 /**
- * The shared immersive page shell for every Textura module page. Provides the
+ * The shared immersive page shell for every Editorial module page. Provides the
  * same furniture as the Command Center — assets-loader preloader, Lenis smooth
- * scroll, the Textura top nav + full-screen index, the fluid-rem grid, a blob
+ * scroll, the Editorial top nav + full-screen index, the fluid-rem grid, a blob
  * hero with spring-revealed title, and the footer — so each page wraps its own
- * data content in `<TexturaShell>…</TexturaShell>` and inherits the whole look.
+ * data content in `<CommandShell>…</CommandShell>` and inherits the whole look.
  *
- * Token overrides on `.tx-stage` (in globals.css) re-skin the shared Card/Badge/
+ * Token overrides on `.ed-stage` (in globals.css) re-skin the shared Card/Badge/
  * Progress primitives the page content uses, so `children` need no changes.
  */
-export function TexturaShell({
+export function CommandShell({
   eyebrow,
   title,
   subtitle,
@@ -75,7 +75,7 @@ export function TexturaShell({
   }, []);
 
   return (
-    <div className="cc-stage tx-stage relative min-h-screen overflow-x-clip">
+    <div className="cc-stage ed-stage relative min-h-screen overflow-x-clip">
       <CommandLoader />
       <SmoothScroll />
       <CommandNav />
@@ -95,14 +95,14 @@ export function TexturaShell({
         <div className="relative z-10 mx-auto w-full max-w-5xl px-5 pt-24">
           <div className="flex items-center justify-center gap-3">
             {icon && (
-              <span className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-[var(--color-tx-accent)]">
+              <span className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-[var(--color-ed-accent)]">
                 {icon}
               </span>
             )}
-            <p className="tx-eyebrow text-[var(--color-tx-accent)]">{eyebrow}</p>
+            <p className="ed-eyebrow text-[var(--color-ed-accent)]">{eyebrow}</p>
           </div>
 
-          <h1 className="cc-ink tx-display mt-6 text-[clamp(2.3rem,8vw,7rem)] leading-[0.95]">
+          <h1 className="cc-ink ed-display mt-6 text-[clamp(2.3rem,8vw,7rem)] leading-[0.95]">
             <SplitText as="span" text={title} delay={140} />
           </h1>
 
@@ -123,21 +123,21 @@ export function TexturaShell({
         </div>
 
         <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-warm/50">
-          <div className="tx-bob flex flex-col items-center gap-1">
-            <span className="tx-eyebrow !text-[0.6rem]">Scroll</span>
+          <div className="ed-bob flex flex-col items-center gap-1">
+            <span className="ed-eyebrow !text-[0.6rem]">Scroll</span>
             <span className="h-8 w-px bg-warm/30" />
           </div>
         </div>
       </section>
 
-      {/* ── Page content (auto-skinned via .tx-stage token overrides) ──── */}
+      {/* ── Page content (auto-skinned via .ed-stage token overrides) ──── */}
       <Reveal as="section" className="mx-auto max-w-7xl space-y-6 px-5 pb-24 lg:px-10">
         {children}
       </Reveal>
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <footer className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/10 px-5 pb-16 pt-8 text-sm text-warm/40 lg:px-10 sm:flex-row">
-        <span className="tx-display text-warm/70">
+        <span className="ed-display text-warm/70">
           <span className="cc-mark-box" aria-hidden="true" />
           VITAL<span className="cc-ink">CHAIN</span>
         </span>

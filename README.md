@@ -64,7 +64,7 @@ src/
     dashboard/         # PageHeader, KpiCard, AlertFeed
     charts/            # Recharts wrappers (temp profile, demand forecast, donut, bars)
     map/               # dependency-free SVG India map with projected nodes + animated routes
-    landing/           # ⭐ Textura-style /intro: WebGL hero-scene, split-text (spring),
+    landing/           # ⭐ Editorial-style /intro: WebGL hero-scene, split-text (spring),
                        #    reveal (spring), smooth-scroll (Lenis), SVG feature diagrams
   lib/
     types.ts           # ⭐ the domain model — the regulatory vocabulary as TypeScript

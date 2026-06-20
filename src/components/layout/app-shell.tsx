@@ -40,7 +40,7 @@ const NAV = [
 ] as const;
 
 // Routes that render full-bleed, without the dashboard sidebar/header chrome.
-// Every Textura surface brings its own navigation (the Textura top nav +
+// Every Editorial surface brings its own navigation (the Editorial top nav +
 // full-screen index), so the whole app is now full-bleed.
 const FULL_BLEED = new Set<string>([
   "/intro",
