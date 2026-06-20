@@ -36,6 +36,16 @@
 
   --radius-card: 14px;
 
+  /* ── Textura-edition landing tokens ──────────────────────────────────────
+     A near-black neutral canvas with a single warm "blush" accent (Textura's
+     signature) sitting alongside the existing clinical teal brand. Used only
+     by the full-bleed marketing landing, never the dashboard. */
+  --color-ink: #060708;
+  --color-ink-2: #0c0e11;
+  --color-warm: #ecd9c9;
+  --color-warm-strong: #f4e3d4;
+  --color-warm-dim: #c8a98f;
+
   /* Depth tokens — layered shadows give the dark surfaces real elevation. */
   --shadow-panel: 0 1px 0 0 #ffffff08 inset, 0 8px 24px -12px #00000080;
   --shadow-lift: 0 1px 0 0 #ffffff10 inset, 0 18px 40px -16px #000000cc;
@@ -212,6 +222,135 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Lenis smooth-scroll runtime classes (added to <html> only while the landing
+   is mounted). Kept minimal so the dashboard's native scrolling is untouched. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   TEXTURA EDITION — full-bleed marketing landing (route: /intro)
+   A separate visual language layered on top of the dashboard system: a
+   near-black canvas, oversized display type, split-text reveals, a WebGL
+   hero. All class-namespaced `tx-` so the dashboard is untouched.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Full-bleed near-black stage. Sits behind the WebGL canvas. */
+.tx-stage {
+  background:
+    radial-gradient(900px 600px at 78% -10%, #15323344 0%, transparent 60%),
+    radial-gradient(760px 520px at 12% 110%, #2a1f1a4d 0%, transparent 58%),
+    var(--color-ink);
+  color: var(--color-warm-strong);
+}
+
+/* Fluid display type — the Textura-scale wordmark. clamp() keeps the giant
+   headline from clipping on mobile (a bug the real Textura site shipped). */
+.tx-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+}
+.tx-hero-mark {
+  font-size: clamp(3.2rem, 13vw, 13rem);
+}
+.tx-h2 {
+  font-size: clamp(2rem, 6vw, 5rem);
+}
+.tx-eyebrow {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.7rem;
+}
+
+/* ── Split-text reveal ──────────────────────────────────────────────────
+   Each word renders server-side inside a clip mask; the inner span starts
+   translated down. Adding `.tx-in` (via IntersectionObserver) slides it up.
+   Deterministic markup → no hydration mismatch (Textura's #418 bug). */
+.tx-split-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.06em; /* room for descenders inside the clip mask */
+}
+.tx-split-inner {
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.tx-in .tx-split-inner {
+  transform: translateY(0);
+}
+
+/* Warm "blush" pill CTA — Textura's primary button. */
+.tx-cta {
+  background: var(--color-warm);
+  color: #1b1411;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+.tx-cta:hover {
+  background: var(--color-warm-strong);
+  transform: translateY(-1px);
+}
+
+/* Hairline ghost button. */
+.tx-ghost {
+  border: 1px solid #ffffff24;
+  color: var(--color-warm-strong);
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.tx-ghost:hover {
+  border-color: #ffffff55;
+  background: #ffffff0a;
+}
+
+/* Oversized scrolling marquee band (services / clients). */
+@keyframes tx-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.tx-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: tx-marquee 28s linear infinite;
+}
+.tx-marquee-row:hover .tx-marquee {
+  animation-play-state: paused;
+}
+
+/* Slow vertical drift for the scroll cue. */
+@keyframes tx-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+.tx-bob {
+  animation: tx-bob 2.2s ease-in-out infinite;
+}
+
+/* Featured-module tile: media zooms gently on hover, label slides up. */
+.tx-tile video,
+.tx-tile img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tx-tile:hover video,
+.tx-tile:hover img {
+  transform: scale(1.05);
+}
+
 /* Respect reduced-motion: kill all non-essential animation (a11y requirement). */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -227,6 +366,10 @@ html {
   }
   .reveal {
     opacity: 1 !important;
+    transform: none !important;
+  }
+  /* Split-text must never hide content when motion is off. */
+  .tx-split-inner {
     transform: none !important;
   }
 }
