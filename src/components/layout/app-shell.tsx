@@ -40,8 +40,8 @@ const NAV = [
 ] as const;
 
 // Routes that render full-bleed, without the dashboard sidebar/header chrome —
-// the immersive marketing landing brings its own navigation.
-const FULL_BLEED = new Set<string>(["/intro"]);
+// the immersive landing and Command Center bring their own navigation.
+const FULL_BLEED = new Set<string>(["/intro", "/"]);
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

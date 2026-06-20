@@ -366,6 +366,163 @@ html.lenis body {
   transform: scale(1.05);
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   COMMAND CENTER — TEXTURA EDITION
+   A faithful port of textura.agency's design system (per the discovery doc):
+   Gilda Display + Lato, the exact coral→icy accent gradient, a fluid-rem grid
+   that scales the whole UI as one, and the assets-loader fade-in. Everything
+   is `cc-`/scope-namespaced so the data dashboard and the /intro landing are
+   untouched.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Both Textura surfaces — the /intro landing and the Command Center — opt into
+   Textura's real type pairing. Because `.tx-*` classes read `--font-display`,
+   redefining the var on `.tx-stage` re-faces every heading to Gilda without
+   touching the global dashboard tokens. The Command Center carries both
+   `.cc-stage` and `.tx-stage`, so this covers it too. */
+.tx-stage {
+  --font-display: var(--font-gilda), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-lato), system-ui, sans-serif;
+  --accent-grad: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
+  font-family: var(--font-body);
+  font-weight: 300;
+}
+/* Gilda ships a single 400 weight — never let a bold utility synthesize it. */
+.tx-stage .tx-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 0.96;
+}
+/* Eyebrows stay sans (Lato) for legible small-caps tracking against the serif. */
+.tx-stage .tx-eyebrow {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+}
+
+/* Hero wordmark at Textura's viewport scale (§6.2: ~11vw, 18vw on mobile). */
+.cc-hero-mark {
+  font-size: clamp(2.6rem, 11vw, 12rem);
+  line-height: 0.92;
+}
+@media (max-width: 576px) {
+  /* 13vw (not Textura's 18vw) so the 10-char VITALCHAIN wordmark fits without
+     clipping on a phone — the giant single line must never overflow. */
+  .cc-hero-mark {
+    font-size: 12vw;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Square brand glyph that precedes the wordmark (Textura's "▢"). */
+.cc-mark-box {
+  display: inline-block;
+  border: 0.08em solid currentColor;
+  width: 0.78em;
+  height: 0.78em;
+  vertical-align: 0.04em;
+  margin-right: 0.18em;
+}
+
+/* Gradient "ink" text — the coral→icy accent, clipped to the glyphs. */
+.cc-ink {
+  background: var(--accent-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Hairline middot services/modules pill (the centered bar in the hero). */
+.cc-pill {
+  border: 1px solid #ffffff24;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+}
+
+/* Gradient pill CTA + underlined ghost link (Textura's two hero actions). */
+.cc-cta {
+  background: var(--accent-grad);
+  color: #04121a;
+  transition: filter 0.25s ease, transform 0.25s ease;
+}
+.cc-cta:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.cc-underline {
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+
+/* Data panel: ink surface, hairline edge, soft elevation. */
+.cc-panel {
+  border: 1px solid #ffffff14;
+  background: var(--color-ink-2);
+  box-shadow: 0 1px 0 0 #ffffff0a inset, 0 24px 60px -32px #000000cc;
+}
+.cc-link {
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+}
+.cc-link:hover {
+  border-color: #a1ecff55;
+  transform: translateY(-2px);
+}
+
+/* Horizontal scroll-snap rail (Textura uses Swiper; this is the same UX, dep-free). */
+.cc-rail {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+}
+.cc-rail::-webkit-scrollbar {
+  display: none;
+}
+.cc-rail > * {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+
+/* Cookies-style notice card (bottom-left furniture from the live site). */
+.cc-cookie {
+  background: #050505f2;
+  border: 1px solid #ffffff1f;
+  backdrop-filter: blur(8px);
+}
+
+/* Full-screen index menu: fades + lifts its big tx-display links in. */
+.cc-menu {
+  background:
+    radial-gradient(900px 600px at 78% -10%, #a1ecff14 0%, transparent 60%),
+    radial-gradient(760px 520px at 12% 110%, #ffab980e 0%, transparent 58%),
+    #000000f2;
+  backdrop-filter: blur(8px);
+}
+@keyframes cc-menu-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.cc-menu-item {
+  animation: cc-menu-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Fluid-rem grid (Textura §6.3) ───────────────────────────────────────
+   The whole UI scales as one: root font-size is pinned to a fraction of the
+   viewport width so every rem-based size zooms together. Scoped to `html`
+   only while the Command Center is mounted (the route component toggles
+   `.cc-fluid`), so the data dashboard keeps its fixed 16px root. */
+html.cc-fluid {
+  font-size: 16px;
+  transition: opacity 0.5s ease;
+}
+@media (max-width: 1920px) { html.cc-fluid { font-size: 0.833333vw; } }
+@media (max-width: 1440px) { html.cc-fluid { font-size: 1.111111vw; } }
+@media (max-width: 1024px) { html.cc-fluid { font-size: 1.562500vw; } }
+@media (max-width: 576px)  { html.cc-fluid { font-size: 4.102564vw; } }
+
 /* Respect reduced-motion: kill all non-essential animation (a11y requirement). */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -386,5 +543,8 @@ html.lenis body {
   /* Split-text must never hide content when motion is off. */
   .tx-split-inner {
     transform: none !important;
+  }
+  .cc-menu-item {
+    animation: none !important;
   }
 }
