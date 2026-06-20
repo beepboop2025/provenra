@@ -121,7 +121,7 @@ export function TexturaLanding() {
       <header className="fixed inset-x-0 top-0 z-50">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-10">
           <Link href="#top" className="tx-display text-lg tracking-tight text-warm-strong">
-            VITAL<span className="text-[var(--color-brand)]">CHAIN</span>
+            VITAL<span className="text-[var(--color-tx-accent)]">CHAIN</span>
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             {NAV.map((n) => (
@@ -161,7 +161,7 @@ export function TexturaLanding() {
           <SplitText
             as="p"
             text="Pharmaceutical supply-chain intelligence"
-            className="tx-eyebrow block text-[var(--color-brand)]"
+            className="tx-eyebrow block text-[var(--color-tx-accent)]"
             stagger={24}
           />
           <h1 className="tx-display tx-hero-mark mt-5 text-warm-strong">
@@ -214,7 +214,7 @@ export function TexturaLanding() {
               {SERVICES.map((s) => (
                 <span key={s} className="tx-display flex items-center text-3xl text-warm/80 lg:text-5xl">
                   <span className="px-6">{s}</span>
-                  <span className="text-[var(--color-brand)]">/</span>
+                  <span className="text-[var(--color-tx-accent)]">/</span>
                 </span>
               ))}
             </span>
@@ -242,7 +242,7 @@ export function TexturaLanding() {
             return (
               <div key={f.tag} className="grid items-center gap-10 md:grid-cols-2 lg:gap-20">
                 <Reveal className={flip ? "md:order-2" : ""}>
-                  <p className="tx-eyebrow text-[var(--color-brand)]">{f.tag}</p>
+                  <p className="tx-eyebrow text-[var(--color-tx-accent)]">{f.tag}</p>
                   <SplitText
                     as="h3"
                     text={f.title}
@@ -254,7 +254,7 @@ export function TexturaLanding() {
                     href={f.href}
                     className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-warm-strong transition-all hover:gap-3"
                   >
-                    Open {f.tag} <ArrowUpRight size={16} className="text-[var(--color-brand)]" />
+                    Open {f.tag} <ArrowUpRight size={16} className="text-[var(--color-tx-accent)]" />
                   </Link>
                 </Reveal>
                 <Reveal delay={120} className={flip ? "md:order-1" : ""}>
@@ -290,7 +290,7 @@ export function TexturaLanding() {
                   </div>
                   <div className="flex items-center justify-between border-t border-white/10 px-7 py-5">
                     <span className="tx-display text-xl text-warm-strong">{m.name}</span>
-                    <ArrowUpRight size={20} className="text-warm/40 transition-colors group-hover:text-[var(--color-brand)]" />
+                    <ArrowUpRight size={20} className="text-warm/40 transition-colors group-hover:text-[var(--color-tx-accent)]" />
                   </div>
                 </Link>
               </Reveal>
@@ -302,7 +302,7 @@ export function TexturaLanding() {
       {/* ── Film (Remotion promo — a real video asset) ──────────── */}
       <section id="film" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-24 lg:px-10">
         <Reveal className="text-center">
-          <p className="tx-eyebrow text-[var(--color-brand)]">The film</p>
+          <p className="tx-eyebrow text-[var(--color-tx-accent)]">The film</p>
           <SplitText as="h2" text="See it move." className="tx-display tx-h2 mt-3 block text-warm-strong" stagger={60} />
         </Reveal>
         <Reveal delay={150} className="mt-12">
@@ -325,7 +325,7 @@ export function TexturaLanding() {
         <div className="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 lg:grid-cols-4">
           {stats.map((s) => (
             <div key={s.label} className="bg-ink-2 px-6 py-10">
-              <div className="tx-display text-4xl tabular-nums text-[var(--color-brand)] lg:text-5xl">{s.value}</div>
+              <div className="tx-display text-4xl tabular-nums text-[var(--color-tx-accent)] lg:text-5xl">{s.value}</div>
               <div className="mt-2 text-sm leading-snug text-warm/55">{s.label}</div>
             </div>
           ))}
@@ -335,7 +335,7 @@ export function TexturaLanding() {
       {/* ── Big closing CTA ─────────────────────────────────────── */}
       <section className="mx-auto max-w-7xl px-5 pb-28 lg:px-10">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/10 px-6 py-24 text-center lg:py-36"
-          style={{ background: "radial-gradient(800px 420px at 50% -10%, #2dd4bf22 0%, transparent 60%), var(--color-ink-2)" }}
+          style={{ background: "radial-gradient(800px 420px at 50% -10%, #a1ecff22 0%, transparent 60%), var(--color-ink-2)" }}
         >
           <SplitText
             as="h2"
@@ -358,7 +358,7 @@ export function TexturaLanding() {
         </div>
 
         <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-warm/40 sm:flex-row">
-          <span className="tx-display text-warm/70">VITAL<span className="text-[var(--color-brand)]">CHAIN</span></span>
+          <span className="tx-display text-warm/70">VITAL<span className="text-[var(--color-tx-accent)]">CHAIN</span></span>
           <span>© 2026 VitalChain · Pharma supply-chain intelligence</span>
         </footer>
       </section>

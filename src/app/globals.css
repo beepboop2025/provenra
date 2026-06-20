@@ -40,11 +40,15 @@
      A near-black neutral canvas with a single warm "blush" accent (Textura's
      signature) sitting alongside the existing clinical teal brand. Used only
      by the full-bleed marketing landing, never the dashboard. */
-  --color-ink: #060708;
-  --color-ink-2: #0c0e11;
-  --color-warm: #ecd9c9;
-  --color-warm-strong: #f4e3d4;
-  --color-warm-dim: #c8a98f;
+  --color-ink: #000000;
+  --color-ink-2: #050505;
+  /* Textura text ramp: near-white headings, grey body. */
+  --color-warm: #c7c7c7;
+  --color-warm-strong: #fafafa;
+  --color-warm-dim: #8a8a8a;
+  /* Textura accent: icy blue + peach, combined as the signature gradient. */
+  --color-tx-accent: #a1ecff;
+  --color-tx-peach: #ffab98;
 
   /* Depth tokens — layered shadows give the dark surfaces real elevation. */
   --shadow-panel: 0 1px 0 0 #ffffff08 inset, 0 8px 24px -12px #00000080;
@@ -248,10 +252,21 @@ html.lenis body {
 /* Full-bleed near-black stage. Sits behind the WebGL canvas. */
 .tx-stage {
   background:
-    radial-gradient(900px 600px at 78% -10%, #15323344 0%, transparent 60%),
-    radial-gradient(760px 520px at 12% 110%, #2a1f1a4d 0%, transparent 58%),
+    radial-gradient(900px 600px at 78% -10%, #a1ecff16 0%, transparent 60%),
+    radial-gradient(760px 520px at 12% 110%, #ffab9810 0%, transparent 58%),
     var(--color-ink);
   color: var(--color-warm-strong);
+}
+
+/* Textura signature accent gradient — reused for CTAs and accent text. */
+.tx-grad {
+  background: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
+}
+.tx-grad-text {
+  background: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Fluid display type — the Textura-scale wordmark. clamp() keeps the giant
@@ -297,12 +312,12 @@ html.lenis body {
 
 /* Warm "blush" pill CTA — Textura's primary button. */
 .tx-cta {
-  background: var(--color-warm);
-  color: #1b1411;
-  transition: background-color 0.25s ease, transform 0.25s ease;
+  background: linear-gradient(241deg, #ffab98 -68.52%, #a1ecff 155.56%);
+  color: #04121a;
+  transition: filter 0.25s ease, transform 0.25s ease;
 }
 .tx-cta:hover {
-  background: var(--color-warm-strong);
+  filter: brightness(1.08);
   transform: translateY(-1px);
 }
 

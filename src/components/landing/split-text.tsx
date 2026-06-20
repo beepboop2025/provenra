@@ -1,44 +1,42 @@
 "use client";
 
-import { createElement, useEffect, useRef, useState, type ElementType } from "react";
+import { createElement, useEffect, useMemo, useRef, useState, type ElementType } from "react";
+import { animated, useTrail } from "@react-spring/web";
 import { cn } from "@/lib/utils";
 
 /**
- * Word-by-word reveal — the Textura signature, done correctly.
+ * Per-letter spring reveal — Textura's actual technique (physics springs, not
+ * CSS transitions), via @react-spring/web `useTrail` for the staggered cascade.
  *
- * Why this avoids Textura's bugs:
- *  - DETERMINISTIC markup: the split happens by `String.split(" ")`, identical
- *    on server and client, so React never reports a hydration mismatch
- *    (Textura threw React #418/#423 on every load by splitting differently).
- *  - ACCESSIBLE: the container carries the full string as its accessible name
- *    and the visual word-shards are `aria-hidden`, so a screen reader reads
- *    one clean sentence instead of spelling it out letter-by-letter.
- *  - MOTION-SAFE: a CSS guard (`prefers-reduced-motion`) parks every word in
- *    its final position, so content is never hidden when motion is off.
+ * Faithful to their spring-text-engine while keeping the bugs out:
+ *  - ACCESSIBLE/SEO: the container carries the full string as its accessible
+ *    name; the per-letter shards are `aria-hidden`, so screen readers read one
+ *    clean sentence and crawlers still see the text.
+ *  - DETERMINISTIC: identical markup on server and client → no hydration crash.
+ *  - MOTION-SAFE: `prefers-reduced-motion` makes the springs immediate.
  *
- * Each word sits in a clip mask; its inner span starts translated 110% down
- * and slides to 0 once the block scrolls into view (one-shot IntersectionObserver).
+ * Letters are grouped per word in `white-space: nowrap` spans so words never
+ * break mid-letter, while the trail index runs continuously for one smooth wave.
  */
 export function SplitText({
   text,
   as: Tag = "span",
   className,
   wordClassName,
-  stagger = 55,
   delay = 0,
 }: {
   text: string;
   as?: ElementType;
   className?: string;
-  /** Per-word class — handy for accenting specific words via a parallel array. */
   wordClassName?: (word: string, index: number) => string | undefined;
-  /** Milliseconds between consecutive word reveals. */
-  stagger?: number;
-  /** Initial delay before the first word reveals (ms). */
+  /** Delay before the cascade starts (ms). */
   delay?: number;
+  /** Accepted for call-site compatibility; spacing is now governed by spring physics. */
+  stagger?: number;
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const [shown, setShown] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
@@ -56,12 +54,22 @@ export function SplitText({
     return () => io.disconnect();
   }, []);
 
-  const words = text.split(" ");
+  const words = useMemo(() => text.split(" "), [text]);
+  const letterCount = useMemo(
+    () => words.reduce((n, w) => n + [...w].length, 0),
+    [words],
+  );
 
-  // Rendered via createElement rather than `<Tag>…</Tag>`: a polymorphic tag
-  // typed as the wide `ElementType` collapses its JSX `children` prop to
-  // `never`, so JSX children fail to type-check. createElement keeps the same
-  // output (and the ref) without that error.
+  const trail = useTrail(letterCount, {
+    opacity: shown ? 1 : 0,
+    y: shown ? 0 : 26,
+    from: { opacity: 0, y: 26 },
+    config: { tension: 260, friction: 26 },
+    delay,
+    immediate: reduced,
+  });
+
+  let idx = 0;
   return createElement(
     Tag,
     {
@@ -69,17 +77,46 @@ export function SplitText({
       "aria-label": text,
       className: cn("tx-split", shown && "tx-in", className),
     },
-    words.map((word, i) => (
-        <span key={`${word}-${i}`} aria-hidden="true" className="tx-split-word">
-          <span
-            className={cn("tx-split-inner", wordClassName?.(word, i))}
-            style={{ transitionDelay: `${delay + i * stagger}ms` }}
+    words.map((word, wi) => {
+      const letters = [...word].map((ch) => {
+        const s = trail[idx++];
+        return (
+          <animated.span
+            key={`${wi}-${idx}`}
+            aria-hidden="true"
+            style={{
+              display: "inline-block",
+              opacity: s.opacity,
+              transform: s.y.to((v) => `translateY(${v}px)`),
+            }}
           >
-            {word}
-          </span>
-          {/* real space between words so the line wraps naturally */}
-          {i < words.length - 1 ? " " : ""}
+            {ch}
+          </animated.span>
+        );
+      });
+      return (
+        <span
+          key={wi}
+          aria-hidden="true"
+          className={cn("tx-word", wordClassName?.(word, wi))}
+          style={{ display: "inline-block", whiteSpace: "nowrap" }}
+        >
+          {letters}
+          {wi < words.length - 1 ? " " : ""}
         </span>
-      )),
+      );
+    }),
   );
+}
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const on = () => setReduced(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return reduced;
 }
