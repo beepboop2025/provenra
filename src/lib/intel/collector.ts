@@ -8,27 +8,88 @@ import type { IntelItem, IntelSeverity } from "@/lib/intel/types";
  *  - openFDA recalls + shortages (JSON API, no key)
  *  - CDSCO India NSQ alerts (PDF) — discovered from the listing, extracted by
  *    Claude (PDF-native) when ANTHROPIC_API_KEY is set, else surfaced as a link.
- * Every fetch is time-boxed and wrapped so a slow/unavailable source degrades
- * gracefully instead of breaking the page.
+ * Every fetch is time-boxed, retried for transient failures, and wrapped so a
+ * slow/unavailable source degrades gracefully instead of breaking the page.
  */
 
 const REVALIDATE = 21_600; // 6h — matches the page ISR window
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+const MAX_RETRIES = 2;
+const RETRY_BACKOFF_MS = [500, 1_000];
+
+type FetchInit = RequestInit & { next?: { revalidate?: number | false } };
+
+function isAbortError(err: unknown): boolean {
+  return err instanceof Error && err.name === "AbortError";
+}
+
+function isTransientError(status: number, err: unknown): boolean {
+  if (status >= 500 || status === 429) return true;
+  if (isAbortError(err)) return true;
+  if (err instanceof TypeError) return true; // network / fetch failures
+  return false;
+}
+
+async function fetchWithRetry(
+  label: string,
+  url: string,
+  timeoutMs: number,
+  init: FetchInit = {},
+): Promise<Response | null> {
+  let lastError: unknown = null;
+  let lastStatus = -1;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...init, signal: ctrl.signal });
+      if (res.ok) return res;
+
+      lastStatus = res.status;
+      lastError = new Error(`HTTP ${res.status}`);
+
+      // 4xx client errors are not transient — don't waste retries.
+      if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+        console.warn(`[${label}] client error ${res.status} at ${url}`);
+        return null;
+      }
+    } catch (err) {
+      lastError = err;
+      lastStatus = -1;
+      if (!isTransientError(-1, err)) {
+        console.warn(`[${label}] non-transient error at ${url}:`, err);
+        return null;
+      }
+    } finally {
+      clearTimeout(t);
+    }
+
+    const delay = RETRY_BACKOFF_MS[attempt];
+    if (delay !== undefined) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  console.warn(
+    `[${label}] exhausted ${MAX_RETRIES + 1} attempts at ${url}`,
+    lastStatus > 0 ? `(last status ${lastStatus})` : "",
+    lastError instanceof Error ? lastError.message : String(lastError),
+  );
+  return null;
+}
 
 async function getJson(url: string): Promise<unknown | null> {
+  const res = await fetchWithRetry("openFDA", url, 10_000, {
+    next: { revalidate: REVALIDATE },
+    headers: { accept: "application/json" },
+  });
+  if (!res) return null;
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 10_000);
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      next: { revalidate: REVALIDATE },
-      headers: { accept: "application/json" },
-    });
-    clearTimeout(t);
-    if (!res.ok) return null;
     return await res.json();
-  } catch {
+  } catch (err) {
+    console.warn(`[openFDA] invalid JSON at ${url}:`, err);
     return null;
   }
 }
@@ -109,14 +170,15 @@ const MONTHS = [
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
 async function getText(url: string): Promise<string | null> {
+  const res = await fetchWithRetry("CDSCO listing", url, 12_000, {
+    next: { revalidate: REVALIDATE },
+    headers: { "user-agent": UA },
+  });
+  if (!res) return null;
   try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 12_000);
-    const res = await fetch(url, { signal: ctrl.signal, next: { revalidate: REVALIDATE }, headers: { "user-agent": UA } });
-    clearTimeout(t);
-    if (!res.ok) return null;
     return await res.text();
-  } catch {
+  } catch (err) {
+    console.warn(`[CDSCO listing] failed to read text at ${url}:`, err);
     return null;
   }
 }
@@ -124,19 +186,25 @@ async function getText(url: string): Promise<string | null> {
 type MonthRef = { idx: number; year: number; label: string };
 
 /** The listing renders month labels (e.g. "April-2025") in its HTML even though
- *  the PDF links are JS-rendered — parse them all, newest first, deduped. */
+ *  the PDF links are JS-rendered — parse them all, newest first, deduped.
+ *  Defensive: a markup change must return [] rather than crash. */
 function parseMonths(html: string): MonthRef[] {
-  const re = /(january|february|march|april|may|june|july|august|september|october|november|december)[\s-]+(20\d{2})/gi;
-  const seen = new Map<number, MonthRef>();
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(html))) {
-    const idx = MONTHS.indexOf(m[1].toLowerCase());
-    const year = Number(m[2]);
-    if (idx < 0) continue;
-    const score = year * 12 + idx;
-    if (!seen.has(score)) seen.set(score, { idx, year, label: `${cap(m[1])} ${year}` });
+  try {
+    const re = /(january|february|march|april|may|june|july|august|september|october|november|december)[\s-]+(20\d{2})/gi;
+    const seen = new Map<number, MonthRef>();
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(html))) {
+      const idx = MONTHS.indexOf(m[1].toLowerCase());
+      const year = Number(m[2]);
+      if (idx < 0) continue;
+      const score = year * 12 + idx;
+      if (!seen.has(score)) seen.set(score, { idx, year, label: `${cap(m[1])} ${year}` });
+    }
+    return [...seen.entries()].sort((a, b) => b[0] - a[0]).map(([, v]) => v);
+  } catch (err) {
+    console.warn("[CDSCO listing] failed to parse month labels:", err);
+    return [];
   }
-  return [...seen.entries()].sort((a, b) => b[0] - a[0]).map(([, v]) => v);
 }
 
 /** Filename casing is inconsistent across months — try the known variants. */
@@ -152,16 +220,16 @@ function pdfCandidates(idx: number, year: number): string[] {
 
 async function findPdf(idx: number, year: number): Promise<{ url: string; buf: ArrayBuffer } | null> {
   for (const url of pdfCandidates(idx, year)) {
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 15_000);
-      const res = await fetch(url, { signal: ctrl.signal, next: { revalidate: REVALIDATE }, headers: { "user-agent": UA } });
-      clearTimeout(t);
-      if (res.ok && (res.headers.get("content-type") ?? "").includes("pdf")) {
+    const res = await fetchWithRetry("CDSCO PDF", url, 15_000, {
+      next: { revalidate: REVALIDATE },
+      headers: { "user-agent": UA },
+    });
+    if (res && (res.headers.get("content-type") ?? "").includes("pdf")) {
+      try {
         return { url, buf: await res.arrayBuffer() };
+      } catch (err) {
+        console.warn(`[CDSCO PDF] failed to read buffer at ${url}:`, err);
       }
-    } catch {
-      /* try next variant */
     }
   }
   return null;

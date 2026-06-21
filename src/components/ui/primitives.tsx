@@ -144,6 +144,7 @@ export function Sparkline({
   width?: number;
   height?: number;
 }) {
+  const id = React.useId();
   if (!data.length) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -156,7 +157,6 @@ export function Sparkline({
   });
   const d = `M ${points.join(" L ")}`;
   const areaD = `${d} L ${width},${height} L 0,${height} Z`;
-  const id = React.useId();
   return (
     <svg width={width} height={height} className="overflow-visible">
       <defs>

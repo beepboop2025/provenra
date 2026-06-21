@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { PackageSearch, TrendingUp, CalendarClock, Boxes, Globe2 } from "lucide-react";
+import { useState } from "react";
+import { PackageSearch, TrendingUp, CalendarClock, Boxes, Globe2, PackageX } from "lucide-react";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
+import { EmptyState } from "@/components/ui/empty-state";
 import { DemandForecastChart } from "@/components/charts/charts";
 import { getData, demandSeries } from "@/lib/data/engine";
 import { supplyResilienceRisk } from "@/lib/analytics";
@@ -22,8 +23,26 @@ const healthTone: Record<StockHealth, "ok" | "warn" | "danger" | "critical" | "i
 export default function InventoryPage() {
   const data = getData();
   const [productId, setProductId] = useState(data.products[0]?.id);
+
+  if (data.products.length === 0) {
+    return (
+      <CommandShell
+        eyebrow="Forecast · Expiry · Resilience"
+        title="Shortage & Inventory Risk"
+        subtitle="Demand forecasting, stockout prediction and FEFO expiry control"
+        icon={<PackageSearch size={22} />}
+      >
+        <EmptyState
+          icon={<PackageX size={22} />}
+          title="No inventory data"
+          description="The inventory dataset is empty. Seed data should populate products, stock and shortage records."
+        />
+      </CommandShell>
+    );
+  }
+
   const product = data.products.find((p) => p.id === productId) ?? data.products[0];
-  const series = useMemo(() => demandSeries(product.id), [product.id]);
+  const series = demandSeries(product.id);
 
   const positions = data.stock.filter((s) => s.productId === product.id);
   const totalOnHand = positions.reduce((a, s) => a + s.onHand, 0);

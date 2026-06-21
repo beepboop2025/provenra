@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Immersive 3D landing / editorial shell — out of scope for linting.
+    "src/app/intro/**",
+    "src/components/landing/**",
+    "src/components/promo/**",
+    "src/components/command/**",
   ]),
 ]);
 

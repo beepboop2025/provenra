@@ -17,6 +17,9 @@ import { formatDate, shelfLifeLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { SerialUnit } from "@/lib/types";
 
+// Captured once at module load so expiry checks do not call Date.now() during render.
+const VERIFICATION_EPOCH = Date.now();
+
 type Verdict =
   | { kind: "idle" }
   | { kind: "notfound"; serial: string }
@@ -147,6 +150,7 @@ function Explainer({ icon, title, body }: { icon: React.ReactNode; title: string
 
 function VerdictView({ verdict }: { verdict: Verdict }) {
   const data = getData();
+  const [now] = useState(() => VERIFICATION_EPOCH);
 
   if (verdict.kind === "idle") {
     return (
@@ -177,7 +181,7 @@ function VerdictView({ verdict }: { verdict: Verdict }) {
   const product = data.products.find((p) => p.id === batch?.productId);
   const facility = data.facilities.find((f) => f.id === unit.currentFacilityId);
   const recalled = unit.status === "recalled" || batch?.status === "recalled";
-  const expired = batch ? new Date(batch.expiryDate).getTime() < Date.now() : false;
+  const expired = batch ? new Date(batch.expiryDate).getTime() < now : false;
   const high = unit.riskScore >= 70;
 
   const blocked = recalled || expired || high;

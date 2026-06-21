@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
+import { EmptyState } from "@/components/ui/empty-state";
 import { DonutChart } from "@/components/charts/charts";
 import { getData, chainOfCustody } from "@/lib/data/engine";
 import { riskBand } from "@/lib/risk";
@@ -83,6 +84,22 @@ export default function TracePage() {
   }, [data.serials]);
 
   const suspectCount = data.serials.filter((s) => s.status === "suspect" || s.riskScore >= 70).length;
+
+  if (data.serials.length === 0) {
+    return (
+      <CommandShell
+        eyebrow="GS1 · Chain of custody"
+        title="Track & Trace"
+        subtitle="GS1 serialization, batch genealogy and anti-counterfeit intelligence"
+        icon={<ScanLine size={22} />}
+      >
+        <EmptyState
+          title="No serialized units"
+          description="The trace dataset is empty. Seed data should populate serials, batches and products."
+        />
+      </CommandShell>
+    );
+  }
 
   return (
     <CommandShell
