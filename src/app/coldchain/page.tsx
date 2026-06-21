@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Snowflake, Thermometer, AlertTriangle, Droplets } from "lucide-react";
+import { Snowflake, Thermometer, AlertTriangle, Droplets, PackageX } from "lucide-react";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
+import { EmptyState } from "@/components/ui/empty-state";
 import { TempProfileChart } from "@/components/charts/charts";
 import { getData, sensorSeries } from "@/lib/data/engine";
 import { formatDateTime, formatRelative, formatTemp } from "@/lib/format";
@@ -12,6 +13,7 @@ import type { Shipment } from "@/lib/types";
 
 export default function ColdChainPage() {
   const data = getData();
+
   const coldShipments = useMemo(
     () =>
       data.shipments
@@ -27,6 +29,23 @@ export default function ColdChainPage() {
   const selected = coldShipments.find((s) => s.id === selectedId) ?? coldShipments[0];
   const product = data.products.find((p) => p.id === selected?.productId);
   const series = useMemo(() => (selected ? sensorSeries(selected) : []), [selected]);
+
+  if (coldShipments.length === 0) {
+    return (
+      <CommandShell
+        eyebrow="WHO-GDP · MKT"
+        title="Cold Chain Monitoring"
+        subtitle="WHO-GDP temperature integrity for vaccines, biologics & insulin"
+        icon={<Snowflake size={22} />}
+      >
+        <EmptyState
+          icon={<PackageX size={22} />}
+          title="No cold-chain shipments"
+          description="No temperature-controlled shipments were returned. Seed data should populate shipments with a required temperature range."
+        />
+      </CommandShell>
+    );
+  }
 
   const liveBreaches = coldShipments.filter((s) => s.status === "exception").length;
   const freezeCount = data.excursions.filter((e) => e.kind === "freeze").length;
