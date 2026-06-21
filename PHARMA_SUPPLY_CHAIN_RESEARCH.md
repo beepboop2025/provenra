@@ -1,6 +1,6 @@
 # Pharmaceutical Supply-Chain Problems: India & Global — Research Report
 
-**Prepared for:** VitalChain product roadmap
+**Prepared for:** Provenra product roadmap
 **Date:** June 2026
 **Method:** Multi-agent deep-research harness (114 agents, 31 sources fetched, 124 claims extracted, 25 adversarially fact-checked with 3-vote verification → 23 confirmed / 2 refuted), supplemented by a targeted second research round to close gaps the harness flagged as unverified.
 
@@ -13,7 +13,7 @@
 
 ## Executive summary
 
-Pharma supply-chain dysfunction — India-centric, with direct global parallels — clusters into **four problem domains that map one-to-one onto VitalChain's four modules**:
+Pharma supply-chain dysfunction — India-centric, with direct global parallels — clusters into **four problem domains that map one-to-one onto Provenra's four modules**:
 
 | Domain | Headline finding | Maps to module |
 |--------|------------------|----------------|
@@ -24,7 +24,7 @@ Pharma supply-chain dysfunction — India-centric, with direct global parallels 
 
 The strategic backdrop: India is the **"pharmacy to the world"** — **>9 in 10 US prescriptions are generics** and India is a critical supplier (~20% of global generic volume, ~60% of global vaccine volume). That makes its traceability and quality gaps a *global* patient-safety issue, and makes software that closes them commercially valuable to exporters facing US/EU buyer scrutiny.
 
-**The single biggest product insight:** the dominant India risk is **not** James-Bond counterfeiting — it's **quality failures (NSQ) and silent cold-chain damage that no one detects in time, in a system with no enforceable way to pull a bad batch nationwide.** VitalChain should weight **NSQ/quality-alert ingestion, freeze detection, single-source risk, and cross-state batch recall** at least as highly as anti-counterfeit serialization.
+**The single biggest product insight:** the dominant India risk is **not** James-Bond counterfeiting — it's **quality failures (NSQ) and silent cold-chain damage that no one detects in time, in a system with no enforceable way to pull a bad batch nationwide.** Provenra should weight **NSQ/quality-alert ingestion, freeze detection, single-source risk, and cross-state batch recall** at least as highly as anti-counterfeit serialization.
 
 ---
 
@@ -157,7 +157,7 @@ The adversarial verification **killed** two plausible-sounding claims — includ
 
 ---
 
-## Findings → VitalChain product roadmap
+## Findings → Provenra product roadmap
 
 | # | Research finding | Concrete feature |
 |---|------------------|------------------|
@@ -170,7 +170,7 @@ The adversarial verification **killed** two plausible-sounding claims — includ
 | P7 | Fragmented C&F→stockist→retail chain | **Distribution-tier visibility** view. |
 | P8 | DSCSA/EU FMD/EPCIS international rails | **Multi-market compliance** matrix (already present — enrich with real deadlines). |
 
-> Items implemented in the accompanying VitalChain update: **P1 (NSQ Watch), P3 (API geo-risk + single-source), P5 (excipient genealogy signal), P6 (GMP-readiness), P4 (cross-state recall), P8 (real DSCSA dates)** — see the app changelog / commit.
+> Items implemented in the accompanying Provenra update: **P1 (NSQ Watch), P3 (API geo-risk + single-source), P5 (excipient genealogy signal), P6 (GMP-readiness), P4 (cross-state recall), P8 (real DSCSA dates)** — see the app changelog / commit.
 
 ---
 

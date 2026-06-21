@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * VitalChain design system.
+ * Provenra design system.
  * A dark, data-dense "command center" aesthetic — the convention for
  * operations/monitoring tooling (think mission control, NOC dashboards).
  * Color choices: teal/cyan primary (clinical trust), amber/red for severity.
@@ -422,7 +422,7 @@ html.lenis body {
   line-height: 0.92;
 }
 @media (max-width: 576px) {
-  /* 13vw (not 18vw) so the 10-char VITALCHAIN wordmark fits without
+  /* 13vw (not 18vw) so the 10-char PROVENRA wordmark fits without
      clipping on a phone — the giant single line must never overflow. */
   .cc-hero-mark {
     font-size: 12vw;

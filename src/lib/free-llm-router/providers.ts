@@ -45,7 +45,7 @@ export const REGISTRY: Provider[] = [
   {
     name: "google_ai_studio",
     baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
-    // VitalChain already uses GEMINI_API_KEY for the native PDF path; reuse it here.
+    // Provenra already uses GEMINI_API_KEY for the native PDF path; reuse it here.
     apiKeyEnv: "GEMINI_API_KEY",
     models: { fast: "gemini-2.0-flash-lite", smart: "gemini-2.0-flash" },
     rpm: 15,

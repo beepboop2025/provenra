@@ -55,7 +55,7 @@ import type {
   ShortageAlert,
   StockPosition,
   Supplier,
-  VitalChainData,
+  ProvenraData,
   WarehouseZone,
 } from "@/lib/types";
 
@@ -1073,9 +1073,9 @@ function buildDispatchLanes(shipments: Shipment[], products: Product[]): Dispatc
 // Assemble (memoized singleton)
 // ────────────────────────────────────────────────────────────────────────────
 
-let _cache: VitalChainData | null = null;
+let _cache: ProvenraData | null = null;
 
-export function getData(): VitalChainData {
+export function getData(): ProvenraData {
   if (_cache) return _cache;
 
   const facilities = buildFacilities();

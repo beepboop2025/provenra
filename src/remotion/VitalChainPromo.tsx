@@ -1,5 +1,5 @@
 /**
- * VitalChain animated promo — a Remotion composition.
+ * Provenra animated promo — a Remotion composition.
  *
  * All motion is FRAME-DRIVEN (useCurrentFrame + interpolate/spring) per Remotion
  * rules; CSS transitions/animations are intentionally avoided as they don't
@@ -257,7 +257,7 @@ function Outro() {
             letterSpacing: "0.04em",
           }}
         >
-          vitalchain.vercel.app
+          provenra.vercel.app
         </div>
       </div>
     </AbsoluteFill>
@@ -265,7 +265,7 @@ function Outro() {
 }
 
 /* ── Master timeline ───────────────────────────────────────────────────── */
-export function VitalChainPromo() {
+export function ProvenraPromo() {
   return (
     <AbsoluteFill style={{ backgroundColor: C.bg, overflow: "hidden" }}>
       <Sequence>

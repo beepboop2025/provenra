@@ -249,7 +249,7 @@ describe("getData", () => {
     expect(a).toBe(b);
   });
 
-  it("produces a complete VitalChainData shape", () => {
+  it("produces a complete ProvenraData shape", () => {
     const data = getData();
     expect(data.markets.length).toBeGreaterThan(0);
     expect(data.facilities.length).toBeGreaterThan(0);

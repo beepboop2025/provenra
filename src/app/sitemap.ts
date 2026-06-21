@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://vitalchain.vercel.app";
+const SITE_URL = "https://provenra.vercel.app";
 
 /** All public routes, surfaced to search and answer engines. */
 export default function sitemap(): MetadataRoute.Sitemap {

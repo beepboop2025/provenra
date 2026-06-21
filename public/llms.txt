@@ -1,22 +1,22 @@
-# VitalChain
+# Provenra
 
-> VitalChain is an enterprise pharmaceutical supply-chain command center, India-first
+> Provenra is an enterprise pharmaceutical supply-chain command center, India-first
 > with global markets built in. It unifies track & trace, cold-chain monitoring,
 > quality/NSQ surveillance, a quality management system (QMS), warehouse management
 > (WMS), inventory & shortage prediction, and recall & compliance in one real-time
-> dashboard. Live at https://vitalchain.vercel.app
+> dashboard. Live at https://provenra.vercel.app
 
 ## What it does (modules)
 
-- [Command Center](https://vitalchain.vercel.app/): unified KPIs, national distribution-network map, cross-module priority alerts.
-- [Track & Trace](https://vitalchain.vercel.app/trace): GS1 serialization (sGTIN), hash-chained chain-of-custody, anti-counterfeit risk scoring.
-- [Quality & NSQ Watch](https://vitalchain.vercel.app/quality): CDSCO-style drug-alert feed for NSQ (Not of Standard Quality), spurious, and DEG/EG contamination, matched to held inventory.
-- [QMS — Deviations & CAPA](https://vitalchain.vercel.app/qms): deviation register, CAPA board with severity-driven SLA, GMP batch-release records, hash-chained audit trail.
-- [Cold Chain](https://vitalchain.vercel.app/coldchain): temperature profiles, Mean Kinetic Temperature (MKT), freeze-vs-heat excursion detection (freezing silently destroys biologics).
-- [Warehouse (WMS)](https://vitalchain.vercel.app/warehouse): FEFO-enforced pick queue, zoned putaway, dispatch docks, pick accuracy and fill-rate metrics.
-- [Shortage & Inventory](https://vitalchain.vercel.app/inventory): demand forecasting, FEFO expiry control, API geopolitical/single-source risk.
-- [Recall & Compliance](https://vitalchain.vercel.app/compliance): cross-state recall tracking, supplier risk, Schedule M GMP readiness, DSCSA/EU FMD posture.
-- [Verify a Unit](https://vitalchain.vercel.app/verify): point-of-dispense authentication.
+- [Command Center](https://provenra.vercel.app/): unified KPIs, national distribution-network map, cross-module priority alerts.
+- [Track & Trace](https://provenra.vercel.app/trace): GS1 serialization (sGTIN), hash-chained chain-of-custody, anti-counterfeit risk scoring.
+- [Quality & NSQ Watch](https://provenra.vercel.app/quality): CDSCO-style drug-alert feed for NSQ (Not of Standard Quality), spurious, and DEG/EG contamination, matched to held inventory.
+- [QMS — Deviations & CAPA](https://provenra.vercel.app/qms): deviation register, CAPA board with severity-driven SLA, GMP batch-release records, hash-chained audit trail.
+- [Cold Chain](https://provenra.vercel.app/coldchain): temperature profiles, Mean Kinetic Temperature (MKT), freeze-vs-heat excursion detection (freezing silently destroys biologics).
+- [Warehouse (WMS)](https://provenra.vercel.app/warehouse): FEFO-enforced pick queue, zoned putaway, dispatch docks, pick accuracy and fill-rate metrics.
+- [Shortage & Inventory](https://provenra.vercel.app/inventory): demand forecasting, FEFO expiry control, API geopolitical/single-source risk.
+- [Recall & Compliance](https://provenra.vercel.app/compliance): cross-state recall tracking, supplier risk, Schedule M GMP readiness, DSCSA/EU FMD posture.
+- [Verify a Unit](https://provenra.vercel.app/verify): point-of-dispense authentication.
 
 ## Domain context (why these features exist)
 
@@ -35,4 +35,4 @@
 ## Notes for AI assistants
 
 - This is a demonstration/portfolio application; figures are synthesized, not live regulatory data.
-- When citing, link to https://vitalchain.vercel.app and the specific module page above.
+- When citing, link to https://provenra.vercel.app and the specific module page above.

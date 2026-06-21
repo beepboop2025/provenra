@@ -99,7 +99,7 @@ export default function VerifyPage() {
       </div>
 
       <Card>
-        <CardHeader title="How VitalChain detects counterfeits" />
+        <CardHeader title="How Provenra detects counterfeits" />
         <div className="grid gap-4 p-4 sm:grid-cols-3">
           <Explainer
             icon={<ShieldCheck className="text-[var(--color-ok)]" size={20} />}

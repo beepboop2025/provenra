@@ -38,20 +38,20 @@ const lato = Lato({
   weight: ["100", "300", "400", "700"],
 });
 
-const SITE_URL = "https://vitalchain.vercel.app";
-const SITE_NAME = "VitalChain";
+const SITE_URL = "https://provenra.vercel.app";
+const SITE_NAME = "Provenra";
 const DESCRIPTION =
-  "VitalChain is an enterprise pharmaceutical supply-chain command center for India and global markets. It unifies GS1 track & trace, cold-chain temperature monitoring, NSQ/quality surveillance, FEFO inventory & shortage prediction, a QMS (deviations & CAPA), warehouse management, and recall & compliance — in one real-time dashboard.";
+  "Provenra is an enterprise pharmaceutical supply-chain command center for India and global markets. It unifies GS1 track & trace, cold-chain temperature monitoring, NSQ/quality surveillance, FEFO inventory & shortage prediction, a QMS (deviations & CAPA), warehouse management, and recall & compliance — in one real-time dashboard.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "VitalChain — Pharma Supply Chain Intelligence",
-    template: "%s · VitalChain",
+    default: "Provenra — Pharma Supply Chain Intelligence",
+    template: "%s · Provenra",
   },
   description: DESCRIPTION,
   applicationName: SITE_NAME,
-  authors: [{ name: "VitalChain" }],
+  authors: [{ name: "Provenra" }],
   generator: "Next.js",
   category: "Healthcare / Supply Chain",
   keywords: [
@@ -76,13 +76,13 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "VitalChain — Pharma Supply Chain Intelligence",
+    title: "Provenra — Pharma Supply Chain Intelligence",
     description: DESCRIPTION,
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "VitalChain — Pharma Supply Chain Intelligence",
+    title: "Provenra — Pharma Supply Chain Intelligence",
     description: DESCRIPTION,
   },
   robots: {
@@ -126,7 +126,7 @@ const jsonLd = {
       name: SITE_NAME,
       url: SITE_URL,
       description:
-        "VitalChain builds pharmaceutical supply-chain intelligence software for manufacturers, distributors and regulators.",
+        "Provenra builds pharmaceutical supply-chain intelligence software for manufacturers, distributors and regulators.",
     },
     {
       "@type": "SoftwareApplication",

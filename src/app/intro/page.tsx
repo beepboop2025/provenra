@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Landing } from "@/components/landing/landing";
 
 export const metadata: Metadata = {
-  title: "VitalChain — Catch the bad batch before it reaches a patient",
+  title: "Provenra — Catch the bad batch before it reaches a patient",
   description:
     "Pharma supply-chain command center for hospital chains and distributors. Catch recalled and substandard (NSQ) batches before they reach a patient, prove cold-chain integrity, enforce FEFO, and reconcile recalls across states. Built India-first.",
   alternates: { canonical: "/intro" },

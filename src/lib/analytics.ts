@@ -12,7 +12,7 @@ import { daysUntil } from "@/lib/format";
 /**
  * Analytics & scoring engine.
  *
- * These are the "brains" of VitalChain — the functions that turn raw events
+ * These are the "brains" of Provenra — the functions that turn raw events
  * into decisions. They are deliberately isolated here (not buried in UI) so
  * they can be unit-tested, audited, and later swapped for ML models without
  * touching the dashboard.

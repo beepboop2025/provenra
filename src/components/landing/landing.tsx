@@ -72,7 +72,7 @@ const FEATURES = [
   {
     tag: "Cold Chain",
     title: "Catch the freeze that ruins a vaccine.",
-    body: "VitalChain computes mean kinetic temperature for every shipment and separates freeze damage from heat. A vial that froze for twenty minutes looks fine on a label and fails a patient. Now you see it.",
+    body: "Provenra computes mean kinetic temperature for every shipment and separates freeze damage from heat. A vial that froze for twenty minutes looks fine on a label and fails a patient. Now you see it.",
     href: "/coldchain",
     Diagram: ColdChainCurve,
   },
@@ -165,7 +165,7 @@ export function Landing() {
             stagger={24}
           />
           <h1 className="ed-display ed-hero-mark mt-5 text-warm-strong">
-            <SplitText as="span" text="VITALCHAIN" className="block" stagger={70} delay={120} />
+            <SplitText as="span" text="PROVENRA" className="block" stagger={70} delay={120} />
           </h1>
           <SplitText
             as="p"
@@ -319,7 +319,7 @@ export function Landing() {
           stagger={34}
         />
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-warm/60">
-          VitalChain ingests CDSCO NSQ alerts, tracks Revised Schedule M readiness and coordinates
+          Provenra ingests CDSCO NSQ alerts, tracks Revised Schedule M readiness and coordinates
           cross-state recalls — with US DSCSA and EU FMD in the same data model.
         </p>
         <div className="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 lg:grid-cols-4">
@@ -351,7 +351,7 @@ export function Landing() {
             <Link href="/" className="ed-cta inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-semibold">
               Enter the command center <ArrowRight size={16} />
             </Link>
-            <a href="mailto:hello@vitalchain.app" className="ed-ghost inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium">
+            <a href="mailto:hello@provenra.app" className="ed-ghost inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium">
               Talk to the team
             </a>
           </div>
@@ -359,7 +359,7 @@ export function Landing() {
 
         <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-warm/40 sm:flex-row">
           <span className="ed-display text-warm/70">VITAL<span className="text-[var(--color-ed-accent)]">CHAIN</span></span>
-          <span>© 2026 VitalChain · Pharma supply-chain intelligence</span>
+          <span>© 2026 Provenra · Pharma supply-chain intelligence</span>
         </footer>
       </section>
     </div>
