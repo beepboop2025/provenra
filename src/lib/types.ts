@@ -1,5 +1,5 @@
 /**
- * VitalChain domain model.
+ * Provenra domain model.
  *
  * This file encodes the pharma supply-chain "vocabulary" as types. In regulated
  * pharma, the data model mirrors the regulatory model: a Batch has legally
@@ -428,7 +428,7 @@ export interface AuditEntry {
  * A GMP deviation — any departure from an approved procedure, specification or
  * standard. In a regulated plant every deviation must be investigated and, if
  * warranted, drive a CAPA. Deviations feed from QC labs, the line, and (in
- * VitalChain) automatically from cold-chain excursions and CDSCO NSQ matches.
+ * Provenra) automatically from cold-chain excursions and CDSCO NSQ matches.
  */
 export type DeviationType =
   | "temperature_excursion"
@@ -625,7 +625,7 @@ export interface Kpi {
 }
 
 /** The fully-assembled dataset the dashboard renders from. */
-export interface VitalChainData {
+export interface ProvenraData {
   markets: Market[];
   facilities: Facility[];
   products: Product[];

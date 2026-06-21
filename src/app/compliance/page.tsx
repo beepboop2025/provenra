@@ -85,7 +85,7 @@ export default function CompliancePage() {
           <Info size={14} className="mt-0.5 shrink-0 text-[var(--color-warn)]" />
           <p className="text-[11px] text-[var(--color-muted)]">
             India has <span className="font-medium text-[var(--color-fg)]">no mandatory nationwide drug-recall law</span> —
-            a batch failing in one state has no enforceable national withdrawal pathway. VitalChain operationalizes
+            a batch failing in one state has no enforceable national withdrawal pathway. Provenra operationalizes
             de-facto nationwide recall via cross-state batch traceability and coordinated notification.
           </p>
         </div>

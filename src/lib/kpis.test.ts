@@ -25,7 +25,7 @@ import type {
   ShortageAlert,
   StockPosition,
   Supplier,
-  VitalChainData,
+  ProvenraData,
   WarehouseZone,
 } from "@/lib/types";
 
@@ -46,7 +46,7 @@ const baseFacility: Facility = {
   certifications: ["WHO-GMP"],
 };
 
-function makeMinimalData(overrides: Partial<VitalChainData> = {}): VitalChainData {
+function makeMinimalData(overrides: Partial<ProvenraData> = {}): ProvenraData {
   return {
     markets: [],
     facilities: [],

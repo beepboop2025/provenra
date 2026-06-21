@@ -73,7 +73,7 @@ describe("hashSeed", () => {
   });
 
   it("returns a 32-bit unsigned integer", () => {
-    const h = hashSeed("VitalChain");
+    const h = hashSeed("Provenra");
     expect(Number.isInteger(h)).toBe(true);
     expect(h).toBeGreaterThanOrEqual(0);
     expect(h).toBeLessThan(2 ** 32);

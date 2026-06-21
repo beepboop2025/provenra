@@ -152,7 +152,7 @@ export function CommandCenter() {
         <div className="relative z-10 mx-auto w-full max-w-5xl px-5 pt-20">
           <h1 className="cc-hero-mark ed-display whitespace-nowrap text-warm-strong">
             <span className="cc-mark-box" aria-hidden="true" />
-            <SplitText as="span" text="VITALCHAIN" className="inline" delay={120} />
+            <SplitText as="span" text="PROVENRA" className="inline" delay={120} />
           </h1>
           {/* Plain text (not SplitText): the cc-ink gradient needs the glyphs to
               live directly on the gradient element, not in nested letter spans. */}
@@ -174,7 +174,7 @@ export function CommandCenter() {
             >
               Verify a unit <ArrowUpRight size={16} />
             </Link>
-            <a href="mailto:hello@vitalchain.app" className="cc-underline text-sm text-warm/80 underline hover:text-warm-strong">
+            <a href="mailto:hello@provenra.app" className="cc-underline text-sm text-warm/80 underline hover:text-warm-strong">
               Book a walkthrough
             </a>
           </Reveal>
@@ -535,7 +535,7 @@ export function CommandCenter() {
             <span className="cc-mark-box" aria-hidden="true" />
             VITAL<span className="cc-ink">CHAIN</span>
           </span>
-          <span>© 2026 VitalChain · Pharma supply-chain intelligence</span>
+          <span>© 2026 Provenra · Pharma supply-chain intelligence</span>
         </footer>
       </section>
 

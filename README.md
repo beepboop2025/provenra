@@ -1,4 +1,4 @@
-# VitalChain — Pharma Supply Chain Intelligence
+# Provenra — Pharma Supply Chain Intelligence
 
 Enterprise pharmaceutical supply-chain command center. **India-first** (CDSCO /
 DAVA-iVEDA serialization, Schedule M, NLEM, WHO-GDP) with **international markets**
@@ -13,11 +13,11 @@ A full-bleed, immersive landing in the visual language of award-winning agency s
 WebGL liquid hero, per-letter spring-physics text, inertial smooth scroll and a
 scroll-driven camera — on a pure-black stage with an icy + peach accent.
 
-![VitalChain landing — hero](docs/screenshots/landing-hero.png)
+![Provenra landing — hero](docs/screenshots/landing-hero.png)
 
 | Platform / features | Mobile |
 |---|---|
-| ![Platform section](docs/screenshots/landing-platform.png) | <img src="docs/screenshots/landing-mobile.png" width="240" alt="VitalChain landing on mobile" /> |
+| ![Platform section](docs/screenshots/landing-platform.png) | <img src="docs/screenshots/landing-mobile.png" width="240" alt="Provenra landing on mobile" /> |
 
 **How it's built**
 - **3D hero** — `three` + `@react-three/fiber` + `@react-three/drei`: a liquid

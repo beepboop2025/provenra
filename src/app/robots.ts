@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://vitalchain.vercel.app";
+const SITE_URL = "https://provenra.vercel.app";
 
 /**
  * robots.txt. We explicitly welcome both classic search crawlers and AI

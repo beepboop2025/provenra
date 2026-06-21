@@ -160,7 +160,7 @@ export function CommandNav() {
             </div>
 
             <footer className="mt-auto flex flex-col gap-2 border-t border-white/10 pt-8 pb-2 text-sm text-warm/40 sm:flex-row sm:items-center sm:justify-between">
-              <span>© 2026 VitalChain · Pharma supply-chain intelligence</span>
+              <span>© 2026 Provenra · Pharma supply-chain intelligence</span>
               <span className="ed-eyebrow">CDSCO · India · multi-market</span>
             </footer>
           </div>

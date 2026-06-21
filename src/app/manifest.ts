@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 /** Web app manifest — improves mobile/PWA presentation and SEO signals. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "VitalChain — Pharma Supply Chain Intelligence",
-    short_name: "VitalChain",
+    name: "Provenra — Pharma Supply Chain Intelligence",
+    short_name: "Provenra",
     description:
       "Enterprise pharmaceutical supply-chain command center: track & trace, cold chain, quality/NSQ, QMS, warehouse, inventory and compliance.",
     start_url: "/",

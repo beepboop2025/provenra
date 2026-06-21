@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "VitalChain — Pharma Supply Chain Intelligence";
+export const alt = "Provenra — Pharma Supply Chain Intelligence";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -55,7 +55,7 @@ export default function OgImage() {
         <div style={{ display: "flex", alignItems: "center", gap: "14px", fontSize: "24px", color: "#5a6a82" }}>
           <span style={{ display: "flex", color: "#2dd4bf" }}>CDSCO · India-first</span>
           <span style={{ display: "flex" }}>·</span>
-          <span style={{ display: "flex" }}>vitalchain.vercel.app</span>
+          <span style={{ display: "flex" }}>provenra.vercel.app</span>
         </div>
       </div>
     ),

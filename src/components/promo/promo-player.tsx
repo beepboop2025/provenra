@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Player } from "@remotion/player";
-import { VitalChainPromo, PROMO } from "@/remotion/VitalChainPromo";
+import { ProvenraPromo, PROMO } from "@/remotion/ProvenraPromo";
 
 /**
  * Client-side Remotion player. Renders the promo composition live in the browser
@@ -29,14 +29,14 @@ export function PromoPlayer() {
     return (
       <div
         style={{ ...frame, background: "var(--color-surface)" }}
-        aria-label="Loading VitalChain intro animation"
+        aria-label="Loading Provenra intro animation"
       />
     );
   }
 
   return (
     <Player
-      component={VitalChainPromo}
+      component={ProvenraPromo}
       durationInFrames={PROMO.durationInFrames}
       fps={PROMO.fps}
       compositionWidth={PROMO.width}

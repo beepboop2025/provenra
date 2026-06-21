@@ -1,10 +1,10 @@
 import { getData, spark } from "@/lib/data/engine";
 import { fefoPickRate } from "@/lib/analytics";
 import { formatCompact, formatPct } from "@/lib/format";
-import type { Kpi, VitalChainData } from "@/lib/types";
+import type { Kpi, ProvenraData } from "@/lib/types";
 
 /** Overview command-center KPIs spanning all four modules. */
-export function overviewKpis(d: VitalChainData = getData()): Kpi[] {
+export function overviewKpis(d: ProvenraData = getData()): Kpi[] {
   const activeShipments = d.shipments.filter((s) => s.status !== "delivered").length;
   const liveExcursions = d.shipments.filter((s) => s.status === "exception").length;
   const suspectUnits = d.serials.filter((s) => s.status === "suspect" || s.riskScore >= 70).length;

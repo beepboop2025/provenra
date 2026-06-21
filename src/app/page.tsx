@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { CommandCenter } from "@/components/command/command-center";
 
 export const metadata: Metadata = {
-  title: "Command Center — VitalChain",
+  title: "Command Center — Provenra",
   description:
-    "The live VitalChain command center: KPIs, the India distribution network, priority alerts, cold-chain excursions, shortage and recall watchlists, and quality/throughput health — one real-time view from factory to bedside.",
+    "The live Provenra command center: KPIs, the India distribution network, priority alerts, cold-chain excursions, shortage and recall watchlists, and quality/throughput health — one real-time view from factory to bedside.",
   alternates: { canonical: "/" },
 };
 

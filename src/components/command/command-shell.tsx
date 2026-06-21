@@ -141,7 +141,7 @@ export function CommandShell({
           <span className="cc-mark-box" aria-hidden="true" />
           VITAL<span className="cc-ink">CHAIN</span>
         </span>
-        <span>© 2026 VitalChain · Pharma supply-chain intelligence</span>
+        <span>© 2026 Provenra · Pharma supply-chain intelligence</span>
       </footer>
     </div>
   );
