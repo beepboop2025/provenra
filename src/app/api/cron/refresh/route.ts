@@ -18,6 +18,12 @@ export async function GET(request: Request) {
     }
   }
 
-  revalidatePath("/intel");
-  return NextResponse.json({ ok: true, revalidated: "/intel", at: new Date().toISOString() });
+  try {
+    revalidatePath("/intel");
+    return NextResponse.json({ ok: true, revalidated: "/intel", at: new Date().toISOString() });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn("[cron/refresh] revalidatePath failed:", err);
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+  }
 }
