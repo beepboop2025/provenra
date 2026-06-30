@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Progress } from "@/components/ui/primitives";
+import { SimulatedBanner } from "@/components/ui/simulated-banner";
 import { getData } from "@/lib/data/engine";
 import { riskBand } from "@/lib/risk";
 import { formatDate, shelfLifeLabel } from "@/lib/format";
@@ -49,6 +50,7 @@ export default function VerifyPage() {
       subtitle="Point-of-dispense authentication — scan or enter a unit serial number"
       icon={<Activity size={22} />}
     >
+      <SimulatedBanner />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Radar, ShieldAlert, PackageX, Bot, Sparkles } from "lucide-react";
+import { Radar, ShieldAlert, PackageX, Bot, Sparkles, Database, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader } from "@/components/ui/primitives";
 import { collectIntel } from "@/lib/intel/collector";
@@ -38,6 +39,31 @@ export default async function IntelPage() {
         </Badge>
       }
     >
+
+      <Card className="border-[var(--color-info)]/30 bg-[var(--color-info)]/5">
+        <div className="flex items-start gap-3 p-4">
+          <Database className="mt-0.5 shrink-0 text-[var(--color-info)]" size={18} />
+          <div className="flex-1">
+            <p className="text-sm text-[var(--color-muted)]">
+              <span className="font-semibold text-[var(--color-fg)]">Real-time feeds, not persisted.</span>{" "}
+              The items below are fetched live on each ISR cycle and are not stored.
+              For persisted, provenance-tracked feeds, open the{" "}
+              <Link href="/nsq" className="text-[var(--color-brand)] hover:underline">
+                NSQ Alerts
+              </Link>
+              ,{" "}
+              <Link href="/recalls" className="text-[var(--color-brand)] hover:underline">
+                FDA Recalls
+              </Link>
+              , or{" "}
+              <Link href="/shortages" className="text-[var(--color-brand)] hover:underline">
+                FDA Shortages
+              </Link>{" "}
+              workspaces.
+            </p>
+          </div>
+        </div>
+      </Card>
 
       {/* Agent pipeline status */}
       <div className="grid gap-3 lg:grid-cols-3">
@@ -156,8 +182,8 @@ export default async function IntelPage() {
 
       <p className="text-center text-[11px] text-[var(--color-faint)]">
         Data sourced from openFDA (US FDA) and CDSCO NSQ alerts (India), refreshed automatically on Vercel. Figures are
-        real public regulatory records and may lag the source. CDSCO rows are auto-extracted from the monthly PDF when
-        an LLM key (free Gemini or Anthropic) is set; otherwise the latest alert is linked directly.
+        real public regulatory records and may lag the source. Persisted, provenance-tracked feeds are in the NSQ Alerts,
+        FDA Recalls, and FDA Shortages workspaces.
       </p>
     </CommandShell>
   );

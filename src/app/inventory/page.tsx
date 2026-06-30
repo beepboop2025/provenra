@@ -5,6 +5,7 @@ import { PackageSearch, TrendingUp, CalendarClock, Boxes, Globe2, PackageX } fro
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SimulatedBanner } from "@/components/ui/simulated-banner";
 import { DemandForecastChart } from "@/components/charts/charts";
 import { getData, demandSeries } from "@/lib/data/engine";
 import { supplyResilienceRisk } from "@/lib/analytics";
@@ -80,6 +81,7 @@ export default function InventoryPage() {
         </Badge>
       }
     >
+      <SimulatedBanner />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">

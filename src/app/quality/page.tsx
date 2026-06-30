@@ -1,6 +1,7 @@
 "use client";
 
-import { FlaskConical, AlertOctagon, Beaker, ShieldX, Info } from "lucide-react";
+import { FlaskConical, AlertOctagon, Beaker, ShieldX, ShieldCheck, Info, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
 import { DonutChart } from "@/components/charts/charts";
@@ -91,6 +92,27 @@ export default function QualityPage() {
         </div>
       </Card>
 
+      <Card className="border-[var(--color-brand)]/30 bg-[var(--color-brand)]/5">
+        <div className="flex items-start gap-3 p-4">
+          <ShieldCheck className="mt-0.5 shrink-0 text-[var(--color-brand)]" size={18} />
+          <div className="flex-1">
+            <p className="text-sm text-[var(--color-muted)]">
+              <span className="font-semibold text-[var(--color-fg)]">
+                Live CDSCO NSQ alerts are now available.
+              </span>{" "}
+              The table below is simulated inventory-matched data for demo purposes. View the real,
+              persisted CDSCO feed for verified records.
+            </p>
+          </div>
+          <Link
+            href="/nsq"
+            className="inline-flex items-center gap-1 text-xs font-medium text-[var(--color-brand)] hover:underline"
+          >
+            Open live NSQ alerts <ArrowUpRight size={12} />
+          </Link>
+        </div>
+      </Card>
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
           <Metric label="Active quality alerts" value={alerts.length} tone="warn" sub="CDSCO monthly feed" />
@@ -111,8 +133,9 @@ export default function QualityPage() {
         <Card className="lg:col-span-2">
           <CardHeader
             title="CDSCO Drug-Alert Feed"
-            subtitle="Not-of-Standard-Quality, spurious & contamination alerts"
+            subtitle="Simulated inventory-matched alerts — for demo only"
             icon={<AlertOctagon size={16} />}
+            action={<Badge tone="warn">Simulated</Badge>}
           />
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
