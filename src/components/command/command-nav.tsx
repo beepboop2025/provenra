@@ -20,6 +20,8 @@ import { logout } from "@/app/actions/auth";
 
 const CORE = [
   { href: "/nsq", label: "NSQ Alerts" },
+  { href: "/recalls", label: "FDA Recalls" },
+  { href: "/shortages", label: "FDA Shortages" },
   { href: "/trace", label: "Track & Trace" },
   { href: "/coldchain", label: "Cold Chain" },
   { href: "/quality", label: "Quality" },
@@ -31,10 +33,11 @@ const CORE = [
 const INDEX: { href: string; label: string; kind: "module" | "tool" }[] = [
   { href: "/", label: "Command Center", kind: "module" },
   { href: "/nsq", label: "NSQ Alerts (live CDSCO)", kind: "module" },
+  { href: "/recalls", label: "FDA Recalls (live openFDA)", kind: "module" },
+  { href: "/shortages", label: "FDA Shortages (live openFDA)", kind: "module" },
   { href: "/trace", label: "Track & Trace", kind: "module" },
   { href: "/quality", label: "Quality & NSQ Watch", kind: "module" },
   { href: "/qms", label: "QMS — Deviations & CAPA", kind: "module" },
-  { href: "/coldchain", label: "Cold Chain", kind: "module" },
   { href: "/warehouse", label: "Warehouse (WMS)", kind: "module" },
   { href: "/inventory", label: "Shortage & Inventory", kind: "module" },
   { href: "/compliance", label: "Recall & Compliance", kind: "module" },

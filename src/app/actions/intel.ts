@@ -51,3 +51,12 @@ export async function syncCdscoNow(): Promise<SyncFormState> {
     return { ok: false, message };
   }
 }
+
+/**
+ * Void-returning form action wrapper for Server Component `<form action>` use
+ * (which requires `() => void | Promise<void>`). The nsq page only triggers the
+ * sync; the state return from syncCdscoNow is unused there.
+ */
+export async function syncCdscoFormAction(): Promise<void> {
+  await syncCdscoNow();
+}

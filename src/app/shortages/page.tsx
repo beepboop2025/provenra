@@ -1,50 +1,49 @@
 import type { Metadata } from "next";
-import { FlaskConical, ExternalLink, RefreshCw, Database, ShieldCheck, AlertCircle } from "lucide-react";
+import { PackageX, ExternalLink, RefreshCw, Database, ShieldCheck, AlertCircle } from "lucide-react";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
 import { verifySession } from "@/lib/auth/dal";
-import { syncCdscoNsq, getCdscoNsqAlerts, getCdscoNsqMeta } from "@/lib/intel/cdsco";
-import { syncCdscoFormAction } from "@/app/actions/intel";
-import { isLiveCdscoRecord } from "@/lib/intel/cdsco/provenance";
+import { syncOpenfdaShortages, getOpenfdaShortages, getOpenfdaMeta } from "@/lib/intel/openfda";
+import { syncOpenfdaFormAction } from "@/app/actions/openfda";
+import { isLiveOpenfdaShortage } from "@/lib/intel/openfda/provenance";
 import { formatRelative, formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {
-  title: "NSQ Alerts — CDSCO (live)",
+  title: "FDA Shortages — openFDA (live)",
   description:
-    "Real CDSCO Not-of-Standard-Quality drug alerts, persisted with provenance and sourced directly from cdscoonline.gov.in.",
-  alternates: { canonical: "/nsq" },
+    "Real FDA drug-shortage records from openFDA, persisted with provenance and sourced directly from api.fda.gov.",
+  alternates: { canonical: "/shortages" },
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function NsqPage() {
+export default async function ShortagesPage() {
   await verifySession();
 
-  let meta = getCdscoNsqMeta();
+  let meta = getOpenfdaMeta();
   let syncError: string | null = null;
 
-  // Bootstrap the feed on first access; afterwards rely on the 6-hour window.
-  if (meta.totalRecords === 0) {
-    const result = await syncCdscoNsq();
+  if (meta.totalShortages === 0) {
+    const result = await syncOpenfdaShortages();
     if (result.status === "failed") {
-      syncError = result.error || "Could not reach CDSCO. Showing any cached records.";
+      syncError = result.error || "Could not reach openFDA. Showing any cached records.";
     }
-    meta = getCdscoNsqMeta();
+    meta = getOpenfdaMeta();
   }
 
-  const alerts = getCdscoNsqAlerts({ limit: 250 });
-  const latest = alerts[0];
-  const liveCount = alerts.filter(isLiveCdscoRecord).length;
+  const shortages = getOpenfdaShortages({ limit: 250 });
+  const latest = shortages[0];
+  const liveCount = shortages.filter(isLiveOpenfdaShortage).length;
 
   return (
     <CommandShell
-      eyebrow="CDSCO · Not-of-Standard-Quality"
-      title="NSQ Alerts"
-      subtitle="Real CDSCO drug-alert records, fetched from cdscoonline.gov.in and persisted with provenance"
-      icon={<FlaskConical size={22} />}
+      eyebrow="openFDA · Drug Shortages"
+      title="FDA Shortages"
+      subtitle="Real FDA drug-shortage records from api.fda.gov, persisted with provenance"
+      icon={<PackageX size={22} />}
       actions={
         <Badge tone="ok" pulse>
-          Live CDSCO data
+          Live openFDA data
         </Badge>
       }
     >
@@ -54,25 +53,25 @@ export default async function NsqPage() {
           <ShieldCheck className="mt-0.5 shrink-0 text-[var(--color-ok)]" size={20} />
           <div className="flex-1">
             <p className="text-sm font-medium text-[var(--color-fg)]">
-              {liveCount === alerts.length
-                ? "Every record below is real CDSCO data."
-                : `${liveCount} of ${alerts.length} records are live CDSCO data.`}
+              {liveCount === shortages.length
+                ? "Every record below is real openFDA data."
+                : `${liveCount} of ${shortages.length} records are live openFDA data.`}
             </p>
             <p className="mt-1 text-xs text-[var(--color-muted)]">
-              Source: <code className="text-[var(--color-brand)]">cdscoonline.gov.in/CDSCO/publicNsqDrugTable</code> ·
-              Parser: <code className="text-[var(--color-brand)]">cdsco-api-1.0</code> ·
+              Source: <code className="text-[var(--color-brand)]">api.fda.gov/drug/shortages.json</code> ·
+              Parser: <code className="text-[var(--color-brand)]">openfda-api-1.0</code> ·
               {meta.latestRetrievedAt
                 ? ` Retrieved ${formatRelative(meta.latestRetrievedAt)}`
                 : " Not yet retrieved"}
             </p>
           </div>
           <a
-            href="https://cdsco.gov.in/opencms/opencms/en/Notifications/nsq-drugs/"
+            href="https://www.fda.gov/drugs/drug-shortages"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-xs text-[var(--color-brand)] hover:underline"
           >
-            CDSCO portal <ExternalLink size={12} />
+            FDA portal <ExternalLink size={12} />
           </a>
         </div>
       </Card>
@@ -81,18 +80,18 @@ export default async function NsqPage() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">
           <Metric
-            label="Live NSQ records"
-            value={meta.totalRecords}
+            label="Live shortages"
+            value={meta.totalShortages}
             tone="ok"
             sub="Persisted with provenance"
           />
         </Card>
         <Card className="p-4">
           <Metric
-            label="Reporting months"
-            value={meta.months.length}
+            label="Statuses"
+            value={meta.shortageStatuses.length}
             tone="brand"
-            sub={meta.months.slice(0, 3).join(", ")}
+            sub={meta.shortageStatuses.slice(0, 3).join(", ")}
           />
         </Card>
         <Card className="p-4">
@@ -106,7 +105,7 @@ export default async function NsqPage() {
         <Card className="p-4">
           <Metric
             label="Primary source"
-            value="CDSCO"
+            value="openFDA"
             tone="brand"
             sub="Direct JSON API"
           />
@@ -125,11 +124,11 @@ export default async function NsqPage() {
       {/* Feed */}
       <Card>
         <CardHeader
-          title="CDSCO NSQ Alert Feed"
-          subtitle={`${alerts.length} persisted records · ${latest ? `latest: ${latest.alertMonth}` : "no data"}`}
+          title="FDA Shortage Feed"
+          subtitle={`${shortages.length} persisted records · ${latest ? `latest: ${latest.updateDate}` : "no data"}`}
           icon={<Database size={16} />}
           action={
-            <form action={syncCdscoFormAction}>
+            <form action={syncOpenfdaFormAction}>
               <button
                 type="submit"
                 className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs text-[var(--color-muted)] transition-colors hover:bg-[var(--color-surface-2)]"
@@ -139,11 +138,11 @@ export default async function NsqPage() {
             </form>
           }
         />
-        {alerts.length === 0 ? (
+        {shortages.length === 0 ? (
           <div className="grid place-items-center gap-2 px-4 py-12 text-center">
             <Database className="text-[var(--color-muted)]" size={28} />
             <p className="text-sm text-[var(--color-muted)]">
-              No CDSCO records persisted yet. Use “Sync now” to fetch the latest alerts.
+              No openFDA shortage records persisted yet. Use “Sync now” to fetch the latest shortages.
             </p>
           </div>
         ) : (
@@ -151,40 +150,38 @@ export default async function NsqPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[var(--color-border)] text-left text-[11px] uppercase tracking-wider text-[var(--color-faint)]">
-                  <th className="px-4 py-2 font-medium">Product</th>
-                  <th className="px-4 py-2 font-medium">Batch</th>
-                  <th className="px-4 py-2 font-medium">Manufacturer</th>
-                  <th className="px-4 py-2 font-medium">Defect / NSQ Result</th>
-                  <th className="px-4 py-2 font-medium">Lab / State</th>
-                  <th className="px-4 py-2 font-medium">Month</th>
+                  <th className="px-4 py-2 font-medium">Drug</th>
+                  <th className="px-4 py-2 font-medium">Company</th>
+                  <th className="px-4 py-2 font-medium">Category</th>
+                  <th className="px-4 py-2 font-medium">Shortage reason</th>
+                  <th className="px-4 py-2 font-medium">Status</th>
+                  <th className="px-4 py-2 font-medium">Updated</th>
                 </tr>
               </thead>
               <tbody>
-                {alerts.map((a) => (
+                {shortages.map((s) => (
                   <tr
-                    key={a.id}
+                    key={s.id}
                     className="border-b border-[var(--color-border)]/60 hover:bg-[var(--color-surface-2)]/40"
                   >
                     <td className="px-4 py-2.5">
-                      <div className="font-medium text-[var(--color-fg)]">{a.productName}</div>
-                      <div className="text-[10px] text-[var(--color-faint)]">
-                        Source: {a.reportingSource}
-                      </div>
-                    </td>
-                    <td className="px-4 py-2.5 font-mono text-[11px] text-[var(--color-brand)]">
-                      {a.batchNo || "—"}
+                      <div className="font-medium text-[var(--color-fg)]">{s.drugName || s.genericName || "—"}</div>
+                      {s.genericName && s.drugName !== s.genericName && (
+                        <div className="text-[10px] text-[var(--color-faint)]">{s.genericName}</div>
+                      )}
                     </td>
                     <td className="max-w-xs px-4 py-2.5 text-xs text-[var(--color-muted)]">
-                      <span className="line-clamp-2">{a.manufacturer || "—"}</span>
-                    </td>
-                    <td className="max-w-sm px-4 py-2.5 text-xs text-[var(--color-muted)]">
-                      <span className="line-clamp-2">{a.defect || "—"}</span>
+                      <span className="line-clamp-2">{s.companyName || "—"}</span>
                     </td>
                     <td className="px-4 py-2.5 text-xs text-[var(--color-muted)]">
-                      {a.reportedByLabOrState || "—"}
+                      {s.therapeuticCategory || "—"}
                     </td>
+                    <td className="max-w-sm px-4 py-2.5 text-xs text-[var(--color-muted)]">
+                      <span className="line-clamp-2">{s.shortageReason || "—"}</span>
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-[var(--color-muted)]">{s.status || "—"}</td>
                     <td className="px-4 py-2.5 text-xs text-[var(--color-muted)] whitespace-nowrap">
-                      {a.alertMonth}
+                      {s.updateDate}
                     </td>
                   </tr>
                 ))}
@@ -195,7 +192,7 @@ export default async function NsqPage() {
       </Card>
 
       <p className="text-center text-[11px] text-[var(--color-faint)]">
-        Data is sourced directly from the public CDSCO online portal. Each row carries provenance
+        Data is sourced directly from the public openFDA API. Each row carries provenance
         (source URL, retrieved timestamp, parser version). No AI extraction was used for this feed.
       </p>
     </CommandShell>

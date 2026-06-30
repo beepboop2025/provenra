@@ -46,12 +46,20 @@ export default async function IntelPage() {
           <div className="flex-1">
             <p className="text-sm text-[var(--color-muted)]">
               <span className="font-semibold text-[var(--color-fg)]">Real-time feeds, not persisted.</span>{" "}
-              openFDA and CDSCO items below are fetched live on each ISR cycle and are not stored.
-              For the persisted, provenance-tracked CDSCO NSQ feed, open the{" "}
+              The items below are fetched live on each ISR cycle and are not stored.
+              For persisted, provenance-tracked feeds, open the{" "}
               <Link href="/nsq" className="text-[var(--color-brand)] hover:underline">
-                NSQ Alerts workspace <ArrowUpRight size={10} className="inline" />
+                NSQ Alerts
               </Link>
-              .
+              ,{" "}
+              <Link href="/recalls" className="text-[var(--color-brand)] hover:underline">
+                FDA Recalls
+              </Link>
+              , or{" "}
+              <Link href="/shortages" className="text-[var(--color-brand)] hover:underline">
+                FDA Shortages
+              </Link>{" "}
+              workspaces.
             </p>
           </div>
         </div>
@@ -174,8 +182,8 @@ export default async function IntelPage() {
 
       <p className="text-center text-[11px] text-[var(--color-faint)]">
         Data sourced from openFDA (US FDA) and CDSCO NSQ alerts (India), refreshed automatically on Vercel. Figures are
-        real public regulatory records and may lag the source. The persisted CDSCO NSQ feed with full provenance is in
-        the NSQ Alerts workspace.
+        real public regulatory records and may lag the source. Persisted, provenance-tracked feeds are in the NSQ Alerts,
+        FDA Recalls, and FDA Shortages workspaces.
       </p>
     </CommandShell>
   );

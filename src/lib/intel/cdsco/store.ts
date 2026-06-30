@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { getDb, initSchema } from "@/lib/intel/db";
+import { getDb, initSchema, recordIngestionRun } from "@/lib/intel/db";
 import type { CdscoNsqAlert, CdscoSyncResult, CdscoFeedMeta } from "@/lib/intel/cdsco/types";
 
 /**
@@ -186,20 +186,7 @@ export function getFeedMeta(): CdscoFeedMeta {
 
 export function recordRun(run: Omit<CdscoSyncResult, "source"> & { error?: string }): void {
   ensureTables();
-  const db = getDb();
-  db.prepare(
-    `INSERT INTO ingestion_runs (source, started_at, finished_at, records_found, records_inserted, records_updated, status, error)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).run(
-    "cdsco",
-    new Date().toISOString(),
-    new Date().toISOString(),
-    run.recordsFound,
-    run.recordsInserted,
-    run.recordsUpdated,
-    run.status,
-    run.error ?? null,
-  );
+  recordIngestionRun("cdsco", run);
 }
 
 export { PARSER_VERSION, EXTRACTION_METHOD };

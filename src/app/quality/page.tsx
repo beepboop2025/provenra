@@ -1,6 +1,6 @@
 "use client";
 
-import { FlaskConical, AlertOctagon, Beaker, ShieldX, Info, ArrowUpRight } from "lucide-react";
+import { FlaskConical, AlertOctagon, Beaker, ShieldX, ShieldCheck, Info, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric } from "@/components/ui/primitives";
