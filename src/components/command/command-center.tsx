@@ -24,6 +24,7 @@ import { NetworkMap } from "@/components/map/network-map";
 import { DonutChart } from "@/components/charts/charts";
 import { AlertFeed } from "@/components/dashboard/alert-feed";
 import { Badge, Progress, Sparkline } from "@/components/ui/primitives";
+import { SimulatedBanner } from "@/components/ui/simulated-banner";
 import { getData } from "@/lib/data/engine";
 import { overviewKpis } from "@/lib/kpis";
 import { fefoPickRate, pickFillRate } from "@/lib/analytics";
@@ -216,6 +217,21 @@ export function CommandCenter() {
           ))}
         </div>
       </div>
+
+      {/* ── Simulation notice ──────────────────────────────────────────── */}
+      <Section eyebrow="Data status" title="What is live vs simulated">
+        <Reveal>
+          <SimulatedBanner>
+            {" "}
+            The command-center overview, network map, shipments, alerts, recalls and KPIs below are
+            all simulated from the seeded demo engine. For real CDSCO NSQ drug alerts, open the{" "}
+            <Link href="/nsq" className="text-[var(--color-brand)] hover:underline">
+              NSQ Alerts
+            </Link>{" "}
+            workspace.
+          </SimulatedBanner>
+        </Reveal>
+      </Section>
 
       {/* ── Live stat band (serif gradient numerals) ───────────────────── */}
       <Section eyebrow="Right now" title="The network at a glance">
@@ -653,7 +669,7 @@ function CookieNotice() {
   return (
     <div className="cc-cookie fixed bottom-5 left-5 z-[55] max-w-sm rounded-2xl p-5">
       <div className="flex items-start justify-between gap-3">
-        <h4 className="ed-display text-xl text-warm-strong">Demo build</h4>
+        <h4 className="ed-display text-xl text-warm-strong">Simulated overview</h4>
         <button
           onClick={() => setOpen(false)}
           aria-label="Dismiss notice"
@@ -663,8 +679,8 @@ function CookieNotice() {
         </button>
       </div>
       <p className="mt-2 text-sm leading-relaxed text-warm/60">
-        Figures are deterministic sample data from the seeded engine, shown to demonstrate the
-        interface. No live patient or facility data is used.
+        This command center shows deterministic sample data from the seeded engine. The live CDSCO
+        NSQ feed is in the NSQ Alerts workspace.
       </p>
       <button
         onClick={() => setOpen(false)}

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
+import { SimulatedBanner } from "@/components/ui/simulated-banner";
 import { getData } from "@/lib/data/engine";
 import { fefoPickRate, pickFillRate } from "@/lib/analytics";
 import { formatNumber, shelfLifeLabel, formatRelative, formatDateTime } from "@/lib/format";
@@ -63,6 +64,7 @@ export default function WarehousePage() {
         </Badge>
       }
     >
+      <SimulatedBanner />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">

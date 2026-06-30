@@ -5,6 +5,7 @@ import { Snowflake, Thermometer, AlertTriangle, Droplets, PackageX } from "lucid
 import { CommandShell } from "@/components/command/command-shell";
 import { Badge, Card, CardHeader, Metric, Progress } from "@/components/ui/primitives";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SimulatedBanner } from "@/components/ui/simulated-banner";
 import { TempProfileChart } from "@/components/charts/charts";
 import { getData, sensorSeries } from "@/lib/data/engine";
 import { formatDateTime, formatRelative, formatTemp } from "@/lib/format";
@@ -77,6 +78,7 @@ export default function ColdChainPage() {
         )
       }
     >
+      <SimulatedBanner />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card className="p-4">

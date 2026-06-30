@@ -20,13 +20,16 @@ import {
   Menu,
   X,
   CircleDot,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getData } from "@/lib/data/engine";
 import { Badge } from "@/components/ui/primitives";
+import { logout } from "@/app/actions/auth";
 
 const NAV = [
   { href: "/", label: "Command Center", icon: LayoutDashboard, module: null },
+  { href: "/nsq", label: "NSQ Alerts (live)", icon: FlaskConical, module: null },
   { href: "/trace", label: "Track & Trace", icon: ScanLine, module: "trace" },
   { href: "/quality", label: "Quality & NSQ Watch", icon: FlaskConical, module: "quality" },
   { href: "/qms", label: "QMS — Deviations & CAPA", icon: ClipboardCheck, module: "qms" },
@@ -45,6 +48,8 @@ const NAV = [
 const FULL_BLEED = new Set<string>([
   "/intro",
   "/",
+  "/nsq",
+  "/login",
   "/trace",
   "/quality",
   "/qms",
@@ -140,12 +145,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="grid h-8 w-8 place-items-center rounded-full bg-[var(--color-violet)]/20 text-xs font-semibold text-[var(--color-violet)]">
               QA
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="truncate text-xs font-medium">Quality &amp; Compliance</div>
               <div className="truncate text-[10px] text-[var(--color-faint)]">
                 Enterprise · CDSCO workspace
               </div>
             </div>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="grid h-8 w-8 place-items-center rounded-lg text-[var(--color-muted)] hover:bg-[var(--color-surface-2)] hover:text-[var(--color-fg)]"
+                aria-label="Sign out"
+              >
+                <LogOut size={16} />
+              </button>
+            </form>
           </div>
         </div>
       </aside>

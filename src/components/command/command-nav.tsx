@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logout } from "@/app/actions/auth";
 
 /**
  * Editorial-edition top navigation for the full-bleed Command Center.
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
  */
 
 const CORE = [
+  { href: "/nsq", label: "NSQ Alerts" },
   { href: "/trace", label: "Track & Trace" },
   { href: "/coldchain", label: "Cold Chain" },
   { href: "/quality", label: "Quality" },
@@ -28,6 +30,7 @@ const CORE = [
 // Every destination, for the full-screen index. `kind` groups them visually.
 const INDEX: { href: string; label: string; kind: "module" | "tool" }[] = [
   { href: "/", label: "Command Center", kind: "module" },
+  { href: "/nsq", label: "NSQ Alerts (live CDSCO)", kind: "module" },
   { href: "/trace", label: "Track & Trace", kind: "module" },
   { href: "/quality", label: "Quality & NSQ Watch", kind: "module" },
   { href: "/qms", label: "QMS — Deviations & CAPA", kind: "module" },
@@ -105,6 +108,15 @@ export function CommandNav() {
             >
               Verify a unit <ArrowUpRight size={15} />
             </Link>
+            <form action={logout} className="hidden sm:block">
+              <button
+                type="submit"
+                className="ed-ghost inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-warm/70 hover:text-warm-strong"
+                aria-label="Sign out"
+              >
+                <LogOut size={15} />
+              </button>
+            </form>
             <button
               onClick={() => setMenuOpen(true)}
               aria-label="Open navigation index"

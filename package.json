@@ -19,9 +19,11 @@
     "@react-three/postprocessing": "^3.0.4",
     "@remotion/player": "^4.0.472",
     "@vercel/analytics": "^2.0.1",
+    "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
+    "jose": "^6.2.3",
     "lenis": "^1.3.23",
     "lucide-react": "^1.17.0",
     "next": "16.2.7",
@@ -31,6 +33,7 @@
     "remotion": "^4.0.472",
     "tailwind-merge": "^3.6.0",
     "three": "^0.184.0",
+    "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
