@@ -46,3 +46,6 @@ PARALLEL_TASKS*.md
 .collaboration/
 FUNDING_ROADMAP.md
 KIMI_WAVE1_REPORT.md
+
+# local cached feed data
+.data/
