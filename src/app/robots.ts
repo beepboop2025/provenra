@@ -1,35 +1,26 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://provenra.vercel.app";
+const SITE_URL = "https://vitalchain.vercel.app";
 
-/**
- * robots.txt. We explicitly welcome both classic search crawlers and AI
- * answer/generative-engine crawlers (AEO/GEO) — GPTBot (ChatGPT), OAI-SearchBot,
- * ClaudeBot, PerplexityBot, Google-Extended (Gemini/AI Overviews), etc. — so the
- * platform can be discovered and cited by AI assistants, not just Google.
- */
+/** Expose the public product page while keeping authenticated modules out of search. */
 export default function robots(): MetadataRoute.Robots {
-  const aiBots = [
-    "GPTBot",
-    "OAI-SearchBot",
-    "ChatGPT-User",
-    "ClaudeBot",
-    "Claude-Web",
-    "anthropic-ai",
-    "PerplexityBot",
-    "Perplexity-User",
-    "Google-Extended",
-    "Applebot-Extended",
-    "CCBot",
-    "Amazonbot",
-    "Bytespider",
-    "Meta-ExternalAgent",
-  ];
   return {
-    rules: [
-      { userAgent: "*", allow: "/" },
-      ...aiBots.map((userAgent) => ({ userAgent, allow: "/" })),
-    ],
+    rules: {
+      userAgent: "*",
+      allow: ["/intro", "/llms.txt", "/.well-known/security.txt"],
+      disallow: [
+        "/api/",
+        "/login",
+        "/trace",
+        "/quality",
+        "/qms",
+        "/coldchain",
+        "/warehouse",
+        "/inventory",
+        "/compliance",
+        "/verify",
+      ],
+    },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   };

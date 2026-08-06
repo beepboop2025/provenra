@@ -11,7 +11,14 @@ import { decrypt } from "@/lib/auth/session";
  * load without a session.
  */
 
-const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/logout"];
+const PUBLIC_PATHS = [
+  "/intro",
+  "/login",
+  "/api/auth/login",
+  "/api/auth/logout",
+  "/llms.txt",
+  "/.well-known/security.txt",
+];
 const STATIC_PREFIXES = ["/_next", "/static", "/favicon.ico", "/manifest", "/robots.txt", "/sitemap.xml"];
 
 export async function proxy(request: NextRequest) {
