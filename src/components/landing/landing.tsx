@@ -64,29 +64,29 @@ const SERVICES = ["Track & Trace", "Cold Chain", "Quality / NSQ", "FEFO Inventor
 const FEATURES = [
   {
     tag: "Track & Trace",
-    title: "Every pack, traceable to its origin.",
-    body: "Serialize to the GS1 unit level and rebuild a hash-chained chain of custody for any pack. When a scan pattern looks wrong, the anti-counterfeit engine flags it before the pack moves again.",
+    title: "Serialization and custody records",
+    body: "The prototype models GS1 unit identifiers, hash-chained custody events, and rule-based scan-pattern flags using deterministic demo records.",
     href: "/trace",
     Diagram: TraceVial,
   },
   {
     tag: "Cold Chain",
-    title: "Catch the freeze that ruins a vaccine.",
-    body: "Provenra computes mean kinetic temperature for every shipment and separates freeze damage from heat. A vial that froze for twenty minutes looks fine on a label and fails a patient. Now you see it.",
+    title: "Cold-chain excursion calculations",
+    body: "The demo computes Mean Kinetic Temperature and classifies freeze and heat excursions for seeded shipment profiles. It does not ingest live sensor telemetry.",
     href: "/coldchain",
     Diagram: ColdChainCurve,
   },
   {
     tag: "At the hospital",
-    title: "Verify before it reaches the patient.",
-    body: "Scan a pack at receiving or the bedside to confirm it is genuine and not under recall. Match every CDSCO quality alert against the stock your pharmacy and wards still hold.",
+    title: "Unit and recall checks",
+    body: "The demonstration matches a scanned demo identifier against seeded genealogy, recall, and quality-alert records. It does not establish authenticity in a production network.",
     href: "/verify",
     Diagram: HospitalScene,
   },
   {
     tag: "Warehouse",
-    title: "Ship the oldest stock first.",
-    body: "Enforce FEFO on every pick so near-expiry stock leaves before it becomes a write-off. Each violation surfaces the moment it happens, not at the next stock count.",
+    title: "FEFO picking workflow",
+    body: "The warehouse module orders seeded inventory by expiry date and flags demo picks that depart from the configured FEFO rule.",
     href: "/warehouse",
     Diagram: FefoShelf,
   },
@@ -104,14 +104,13 @@ export function Landing() {
   const webgl = useWebGL();
   const animate = webgl && !reduced;
 
-  // Real platform figures — the honest answer to a vanity stat. These come from
-  // the live data engine, so they are never a fabricated "1.98".
+  // Deterministic demonstration figures from the repository's seed-data engine.
   const data = getData();
   const stats = [
-    { value: formatCompact(data.serials.length), label: "Serials under trace" },
-    { value: String(data.facilities.length), label: "Facilities on the network" },
-    { value: String(data.shipments.length), label: "Shipments in motion" },
-    { value: "7", label: "Regulatory markets modelled" },
+    { value: formatCompact(data.serials.length), label: "Demo serials" },
+    { value: String(data.facilities.length), label: "Seeded facilities" },
+    { value: String(data.shipments.length), label: "Demo shipments" },
+    { value: "7", label: "Market schemas modelled" },
   ];
 
   return (
@@ -121,7 +120,7 @@ export function Landing() {
       <header className="fixed inset-x-0 top-0 z-50">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-10">
           <Link href="#top" className="ed-display text-lg tracking-tight text-warm-strong">
-            VITAL<span className="text-[var(--color-ed-accent)]">CHAIN</span>
+            PRO<span className="text-[var(--color-ed-accent)]">VENRA</span>
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             {NAV.map((n) => (
@@ -138,7 +137,7 @@ export function Landing() {
             href="/"
             className="ed-cta inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold"
           >
-            Enter <ArrowRight size={15} />
+            Sign in <ArrowRight size={15} />
           </Link>
         </nav>
       </header>
@@ -169,7 +168,7 @@ export function Landing() {
           </h1>
           <SplitText
             as="p"
-            text="Catch the bad batch before it reaches a patient."
+            text="Pharmaceutical supply-chain workflows, demonstrated with seeded data."
             className="ed-display mt-6 block max-w-3xl text-2xl leading-[1.1] text-warm/90 lg:text-4xl"
             stagger={26}
             delay={420}
@@ -179,7 +178,7 @@ export function Landing() {
               href="/"
               className="ed-cta inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold"
             >
-              Enter the command center <ArrowRight size={16} />
+              Sign in to the dashboard <ArrowRight size={16} />
             </Link>
             <a
               href="#film"
@@ -226,13 +225,13 @@ export function Landing() {
       <section id="platform" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 lg:px-10 lg:py-36">
         <SplitText
           as="h2"
-          text="One command center for the journey from factory to bedside."
+          text="A prototype for supply-chain workflows from factory to bedside."
           className="ed-display ed-h2 max-w-5xl text-warm-strong"
           stagger={32}
         />
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-warm/60">
-          Track &amp; trace, cold chain, quality surveillance, FEFO inventory and recall
-          reconciliation — unified, real-time, and built India-first for CDSCO.
+          Explore serialization, cold-chain calculations, quality alerts, FEFO inventory,
+          and recall workflows using deterministic demonstration data.
         </p>
 
         <div className="mt-20 space-y-28">
@@ -339,17 +338,17 @@ export function Landing() {
         >
           <SplitText
             as="h2"
-            text="Let's talk."
+            text="Explore the prototype."
             className="ed-display block text-warm-strong"
             wordClassName={() => "text-[clamp(3rem,11vw,9rem)]"}
             stagger={80}
           />
           <p className="mx-auto mt-6 max-w-xl text-lg text-warm/60">
-            Open the command center and watch trace, cold chain, quality and recalls update together.
+            Sign in to explore the seeded trace, cold-chain, quality, inventory, and recall workflows.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Link href="/" className="ed-cta inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-semibold">
-              Enter the command center <ArrowRight size={16} />
+              Sign in to the dashboard <ArrowRight size={16} />
             </Link>
             <a href="mailto:hello@provenra.app" className="ed-ghost inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium">
               Talk to the team
@@ -358,8 +357,8 @@ export function Landing() {
         </div>
 
         <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-warm/40 sm:flex-row">
-          <span className="ed-display text-warm/70">VITAL<span className="text-[var(--color-ed-accent)]">CHAIN</span></span>
-          <span>© 2026 Provenra · Pharma supply-chain intelligence</span>
+          <span className="ed-display text-warm/70">PRO<span className="text-[var(--color-ed-accent)]">VENRA</span></span>
+          <span>© 2026 Provenra · Pharmaceutical supply-chain prototype</span>
         </footer>
       </section>
     </div>

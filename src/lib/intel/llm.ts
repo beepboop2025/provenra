@@ -7,7 +7,7 @@ import { getFreeRouter, type ChatMessage } from "@/lib/free-llm-router/router";
  *
  * Resolution order:
  *   1. Free LLM router → fails over across Groq/Cerebras/Gemini/Mistral/OpenRouter
- *      (text-only requests). Perpetually-free; multi-provider resilience.
+ *      (text-only requests). Free-tier availability and quotas vary by provider.
  *   2. GEMINI_API_KEY   → Google Gemini native (required for PDF-grounded extraction)
  *   3. ANTHROPIC_API_KEY → Claude (paid API)
  *   4. none             → callers use their deterministic fallback

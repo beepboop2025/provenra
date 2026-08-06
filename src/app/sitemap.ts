@@ -1,28 +1,13 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = "https://provenra.vercel.app";
+const SITE_URL = "https://vitalchain.vercel.app";
 
-/** All public routes, surfaced to search and answer engines. */
+/** The public product route; application modules require authentication. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = [
-    "", // Command Center
-    "/intro",
-    "/trace",
-    "/quality",
-    "/qms",
-    "/coldchain",
-    "/warehouse",
-    "/inventory",
-    "/compliance",
-    "/verify",
-  ];
-  // Fixed lastModified (matches the data engine's deterministic NOW) so the
-  // sitemap is byte-stable across builds rather than churning every deploy.
-  const lastModified = new Date("2026-06-05");
-  return routes.map((path) => ({
-    url: `${SITE_URL}${path}`,
-    lastModified,
-    changeFrequency: "daily",
-    priority: path === "" ? 1 : 0.8,
-  }));
+  return [{
+    url: `${SITE_URL}/intro`,
+    lastModified: new Date("2026-08-06"),
+    changeFrequency: "monthly",
+    priority: 1,
+  }];
 }

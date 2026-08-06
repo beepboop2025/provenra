@@ -38,15 +38,16 @@ const lato = Lato({
   weight: ["100", "300", "400", "700"],
 });
 
-const SITE_URL = "https://provenra.vercel.app";
+const SITE_URL = "https://vitalchain.vercel.app";
+const PUBLIC_URL = `${SITE_URL}/intro`;
 const SITE_NAME = "Provenra";
 const DESCRIPTION =
-  "Provenra is an enterprise pharmaceutical supply-chain command center for India and global markets. It unifies GS1 track & trace, cold-chain temperature monitoring, NSQ/quality surveillance, FEFO inventory & shortage prediction, a QMS (deviations & CAPA), warehouse management, and recall & compliance — in one real-time dashboard.";
+  "Prototype pharmaceutical supply-chain dashboard for serialization, cold-chain monitoring, quality alerts, inventory, QMS, warehouse, and recall workflows using deterministic demo data.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Provenra — Pharma Supply Chain Intelligence",
+    default: "Provenra | Pharmaceutical supply-chain prototype",
     template: "%s · Provenra",
   },
   description: DESCRIPTION,
@@ -54,35 +55,17 @@ export const metadata: Metadata = {
   authors: [{ name: "Provenra" }],
   generator: "Next.js",
   category: "Healthcare / Supply Chain",
-  keywords: [
-    "pharmaceutical supply chain",
-    "pharma track and trace",
-    "GS1 serialization",
-    "cold chain monitoring",
-    "drug shortage prediction",
-    "NSQ not of standard quality",
-    "CDSCO",
-    "Schedule M GMP",
-    "FEFO inventory",
-    "QMS deviation CAPA",
-    "warehouse management WMS",
-    "recall compliance",
-    "DSCSA",
-    "EU FMD",
-    "India pharma",
-  ],
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    url: SITE_URL,
+    url: PUBLIC_URL,
     siteName: SITE_NAME,
-    title: "Provenra — Pharma Supply Chain Intelligence",
+    title: "Provenra | Pharmaceutical supply-chain prototype",
     description: DESCRIPTION,
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Provenra — Pharma Supply Chain Intelligence",
+    title: "Provenra | Pharmaceutical supply-chain prototype",
     description: DESCRIPTION,
   },
   robots: {
@@ -104,48 +87,34 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/**
- * JSON-LD structured data. This is the machine-readable description that search
- * engines (SEO) and AI answer/generative engines (AEO/GEO — ChatGPT, Perplexity,
- * Gemini, Google AI Overviews) parse to understand and cite the product.
- */
+/** Machine-readable identity for the public product page. */
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": `${SITE_URL}/#website`,
-      url: SITE_URL,
+      "@id": `${PUBLIC_URL}#website`,
+      url: PUBLIC_URL,
       name: SITE_NAME,
       description: DESCRIPTION,
       inLanguage: "en",
     },
     {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#org`,
-      name: SITE_NAME,
-      url: SITE_URL,
-      description:
-        "Provenra builds pharmaceutical supply-chain intelligence software for manufacturers, distributors and regulators.",
-    },
-    {
-      "@type": "SoftwareApplication",
+      "@type": "WebApplication",
       name: SITE_NAME,
       applicationCategory: "BusinessApplication",
       applicationSubCategory: "Supply Chain Management",
       operatingSystem: "Web",
-      url: SITE_URL,
+      url: PUBLIC_URL,
       description: DESCRIPTION,
       featureList: [
-        "GS1 track & trace with hash-chained chain-of-custody",
-        "Cold-chain temperature monitoring with MKT and freeze detection",
-        "NSQ / spurious / DEG-EG quality surveillance (CDSCO alerts)",
-        "FEFO inventory and drug-shortage prediction",
-        "QMS: deviation register and CAPA lifecycle",
-        "Warehouse management (WMS) with FEFO-enforced picking",
-        "Recall tracking and Schedule M / DSCSA / EU FMD compliance",
+        "GS1 serialization and demo chain-of-custody workflows",
+        "Cold-chain calculations with MKT and freeze detection",
+        "Quality and NSQ alert workflow demonstrations",
+        "FEFO inventory and shortage-risk calculations",
+        "QMS deviation and CAPA workflows",
+        "Warehouse and recall workflow demonstrations",
       ],
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
   ],
 };
