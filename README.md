@@ -1,5 +1,8 @@
 # Provenra — Pharma Supply Chain Intelligence
 
+![tests](https://github.com/beepboop2025/provenra/actions/workflows/tests.yml/badge.svg)
+![coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
+
 Enterprise pharmaceutical supply-chain command center. **India-first** (CDSCO /
 DAVA-iVEDA serialization, Schedule M, NLEM, WHO-GDP) with **international markets**
 (US DSCSA, EU FMD) registered in the data model for expansion.

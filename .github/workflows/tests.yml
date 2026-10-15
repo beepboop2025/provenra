@@ -1,0 +1,36 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Vitest (coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Pure-logic unit tests only — no network, DB, or API keys required.
+      - name: Run tests with coverage
+        run: pnpm exec vitest run --coverage
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo "Coverage (text-summary) printed above by vitest/v8."
